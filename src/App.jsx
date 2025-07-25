@@ -6,11 +6,9 @@ import TodoListReducer from "./components/task2/TodoListReducer";
 
 function App() {
 	return (
-		<div className="grid ">
-			<LoginInput></LoginInput>
-			{/* <TodoList /> */}
-			{/* <TodoListReducer></TodoListReducer> */}
-		</div>
+		<LoginInput></LoginInput>
+		// {/* <TodoList /> */}
+		// {/* <TodoListReducer></TodoListReducer> */}
 	);
 }
 

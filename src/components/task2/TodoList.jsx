@@ -69,6 +69,9 @@ const TodoList = () => {
 					type="text"
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") handleAddTodo();
+					}}
 					placeholder="Add a new todo"
 					className="flex-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 				/>
