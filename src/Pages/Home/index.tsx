@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import ValidatedInput from '../../Components/Inputform';
-import { validateEmail, validatePhone } from '../../Utils/validate';
+import {
+  validateEmail,
+  validatePhone,
+  validatePassword,
+} from '../../Utils/validate';
 
 const Home: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = () => {
     setSubmitted(true);
 
     const emailError = validateEmail(email);
     const phoneError = validatePhone(phone);
+    const passwordError = validatePassword(password);
 
-    if (!emailError && !phoneError) {
+    if (!emailError && !phoneError && !passwordError) {
       alert('Form submitted successfully!');
     }
     if (emailError) {
@@ -22,6 +28,9 @@ const Home: React.FC = () => {
     }
     if (phoneError) {
       alert(`${phoneError}`);
+    }
+    if (passwordError) {
+      alert(`${passwordError}`);
     }
   };
 
@@ -44,6 +53,15 @@ const Home: React.FC = () => {
         value={phone}
         setValue={setPhone}
         validationFn={validatePhone}
+        submitted={submitted}
+      />
+
+      <ValidatedInput
+        label="Password"
+        placeholder="123456"
+        value={password}
+        setValue={setPassword}
+        validationFn={validatePassword}
         submitted={submitted}
       />
 
