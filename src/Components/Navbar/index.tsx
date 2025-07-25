@@ -7,17 +7,16 @@ function Navbar() {
         <div className="flex items-center m-4">
           <Link to={'/'}>
             <div className="flex pr-3 pl-3">
-              <div className="mt-7 text-xs xl:text-sm font-bold">Home</div>
+              <div className="mt-7 text-xs xl:text-sm font-bold">
+                Input form
+              </div>
             </div>
           </Link>
-          <Link to={'/about'}>
+          <Link to={'/todolist'}>
             <div className="flex pr-3 pl-3">
-              <div className="mt-7 text-xs xl:text-sm font-bold">About</div>
-            </div>
-          </Link>
-          <Link to={'/contact'}>
-            <div className="flex pr-3 pl-3">
-              <div className="mt-7 text-xs xl:text-sm font-bold">Contact</div>
+              <div className="mt-7 text-xs xl:text-sm font-bold">
+                To do list
+              </div>
             </div>
           </Link>
         </div>
