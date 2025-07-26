@@ -1,8 +1,10 @@
 export type ValidatedInputProps = {
+  id: string;
   label: string;
-  placeholder?: string;
-  validationFn: () => string | null;
+  placeholder: string;
   value: string;
-  setValue: () => void;
-  submitted: boolean; // truyền từ component cha
+  setValue: (value: string) => void;
+  validationFn: (value: string) => string;
+  submitted: boolean;
+  type?: string;
 };
