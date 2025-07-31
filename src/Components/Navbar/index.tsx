@@ -14,9 +14,7 @@ function Navbar() {
           </Link>
           <Link to={'/breed'}>
             <div className="flex pr-3 pl-3">
-              <div className="mt-7 text-xs xl:text-sm font-bold">
-                To do list
-              </div>
+              <div className="mt-7 text-xs xl:text-sm font-bold">Breed</div>
             </div>
           </Link>
           {/* <Link to={'/watchstop'}>
