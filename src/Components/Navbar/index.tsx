@@ -12,13 +12,18 @@ function Navbar() {
               </div>
             </div>
           </Link>
-          <Link to={'/todolist'}>
+          <Link to={'/breed'}>
             <div className="flex pr-3 pl-3">
               <div className="mt-7 text-xs xl:text-sm font-bold">
                 To do list
               </div>
             </div>
           </Link>
+          {/* <Link to={'/watchstop'}>
+            <div className="flex pr-3 pl-3">
+              <div className="mt-7 text-xs xl:text-sm font-bold">watchstop</div>
+            </div>
+          </Link> */}
         </div>
       </div>
     </header>

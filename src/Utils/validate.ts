@@ -11,6 +11,29 @@ export const validatePhone = (value: string): string | null => {
 };
 
 export const validatePassword = (value: string): string | null => {
-  if (!value) return 'Password is required';
-  if (value.length < 6) return 'Password must be at least 6 characters';
+  if (!value) {
+    return 'Password is required';
+  }
+
+  if (value.length < 6) {
+    return 'Password must be at least 6 characters';
+  }
+
+  if (!/[a-z]/.test(value)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+
+  if (!/[A-Z]/.test(value)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+
+  if (!/[0-9]/.test(value)) {
+    return 'Password must contain at least one digit';
+  }
+
+  if (!/[!@#$%^&*]/.test(value)) {
+    return 'Password must contain at least one special character (!@#$%^&*)';
+  }
+
+  return null; // hợp lệ
 };
