@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addTodo, deleteTodo, editTodo } from "../../features/todos/todoSlice";
 
 const TodoList = () => {
-	const [todos, setTodos] = useState([
-		{ id: 1, text: "Learn React" },
-		{ id: 2, text: "Learn TypeScript" },
-	]);
+	// const [todos, setTodos] = useState([
+	// 	{ id: 1, text: "Learn React" },
+	// 	{ id: 2, text: "Learn TypeScript" },
+	// ]);
+	const todos = useSelector((state) => state.todo); // Fetch todos from Redux store
 
+	const dispatch = useDispatch();
 	// State for the input field value
 	const [inputValue, setInputValue] = useState("");
 
@@ -25,13 +29,17 @@ const TodoList = () => {
 			text: inputValue.trim(),
 		};
 
-		setTodos([...todos, newTodo]);
+		dispatch(addTodo(newTodo)); // Dispatch action to add todo to Redux store
 		setInputValue(""); // Clear the input field
 	};
 
 	// Handler for deleting a todo
 	const handleDeleteTodo = (id) => {
-		setTodos(todos.filter((todo) => todo.id !== id));
+		console.log(id);
+		dispatch(deleteTodo(id)); // Dispatch action to delete todo from Redux store
+		if (editingId === id) {
+			setEditingId(null); // Exit editing mode if the deleted todo was being edited
+		}
 	};
 
 	// Handler to start the editing process
@@ -47,12 +55,8 @@ const TodoList = () => {
 			handleDeleteTodo(id);
 			return;
 		}
+		dispatch(editTodo({ id, text: editText.trim() })); // Dispatch action to update todo in Redux store
 
-		const updatedTodos = todos.map((todo) =>
-			todo.id === id ? { ...todo, text: editText.trim() } : todo
-		);
-
-		setTodos(updatedTodos);
 		setEditingId(null); // Exit editing mode
 		setEditText("");
 	};
@@ -85,7 +89,7 @@ const TodoList = () => {
 
 			{/* List of todos */}
 			<ul className="p-0 list-none">
-				{todos.map((todo) => (
+				{todos?.map((todo) => (
 					<li
 						key={todo.id}
 						className="flex items-center justify-between p-4 mb-3 border border-gray-200 rounded-md shadow-sm bg-gray-50"

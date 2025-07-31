@@ -22,7 +22,7 @@ const ValidatedInput = ({ label, errorMessage, type = "text" }) => {
 			}
 			setError(!isValid);
 		} else {
-			setError(false); // Do not show error on initial empty input
+			setError(false);
 		}
 	}, [value, type]);
 

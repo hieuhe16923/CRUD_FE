@@ -19,12 +19,12 @@ const LoginInput = () => {
 					/>
 				</div>
 
-				<a href="/">
+				{/* <a href="/">
 					{" "}
 					<button className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600">
 						Login
 					</button>
-				</a>
+				</a> */}
 			</div>
 		</div>
 	);
