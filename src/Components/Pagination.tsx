@@ -1,32 +1,29 @@
 import React from 'react';
-
-interface PaginationProps {
-  meta: {
-    pagination: {
-      current: number;
-      next?: number;
-      last: number;
-      records: number;
-    };
-  };
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-}
+import { PaginationProps } from '../Types/Pagination';
 
 const PaginationComponent: React.FC<PaginationProps> = ({
   meta,
   currentPage,
   setCurrentPage,
 }) => {
-  const totalPages = meta?.pagination?.last ?? 1;
+  const recordsPerPage = 10;
+  const totalRecords = meta?.pagination?.records ?? 0;
+  const totalPages = Math.ceil(totalRecords / recordsPerPage);
 
   const createPageButton = (page: number) => (
     <button
       key={page}
       onClick={() => setCurrentPage(page)}
-      className={`px-3 py-1 border rounded ${
-        currentPage === page ? 'bg-blue-500 text-white' : 'bg-white'
-      }`}
+      className={`
+        min-w-[44px] h-11 px-4 py-2 text-sm font-medium rounded-xl
+        transition-all duration-200
+        ${
+          currentPage === page
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+            : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600'
+        }
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+      `}
     >
       {page}
     </button>
@@ -34,30 +31,78 @@ const PaginationComponent: React.FC<PaginationProps> = ({
 
   const buttons: (JSX.Element | string)[] = [];
 
-  // Trang đầu tiên
-  buttons.push(createPageButton(1));
-
-  // Hiển thị từ trang 2 đến trang hiện tại + 1
-  const maxMiddle = Math.min(currentPage + 1, totalPages - 1);
-  for (let i = 2; i <= maxMiddle; i++) {
-    buttons.push(createPageButton(i));
-  }
-
-  // Dấu ... nếu còn trang ở giữa
-  if (currentPage + 1 < totalPages - 1) {
+  // Previous button
+  if (currentPage > 1) {
     buttons.push(
-      <span key="ellipsis" className="px-2 py-1 select-none">
-        ...
-      </span>
+      <button
+        key="prev"
+        onClick={() => setCurrentPage(currentPage - 1)}
+        className="min-w-[44px] h-11 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        ←
+      </button>
     );
   }
 
-  // Trang cuối cùng nếu khác trang đầu
-  if (totalPages > 1) {
-    buttons.push(createPageButton(totalPages));
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) {
+      buttons.push(createPageButton(i));
+    }
+  } else {
+    const showLeftEllipsis = currentPage > 4;
+    const showRightEllipsis = currentPage < totalPages - 3;
+
+    buttons.push(createPageButton(1));
+
+    if (showLeftEllipsis) {
+      buttons.push(
+        <span key="start-ellipsis" className="px-2 py-2 text-gray-400">
+          ...
+        </span>
+      );
+    }
+
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(createPageButton(i));
+    }
+
+    if (showRightEllipsis) {
+      buttons.push(
+        <span key="end-ellipsis" className="px-2 py-2 text-gray-400">
+          ...
+        </span>
+      );
+    }
+
+    if (totalPages > 1) {
+      buttons.push(createPageButton(totalPages));
+    }
   }
 
-  return <div className="flex justify-center space-x-2 mt-4">{buttons}</div>;
+  // Next button
+  if (currentPage < totalPages) {
+    buttons.push(
+      <button
+        key="next"
+        onClick={() => setCurrentPage(currentPage + 1)}
+        className="min-w-[44px] h-11 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        →
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center space-y-3 mt-8">
+      <div className="text-sm text-gray-600">
+        Page {currentPage} of {totalPages} • {totalRecords} results
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">{buttons}</div>
+    </div>
+  );
 };
 
 export default PaginationComponent;
