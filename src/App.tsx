@@ -1,20 +1,26 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+// App.tsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed Link import as buttons are removed
 import Navbar from './Components/Navbar';
-import Contact from './Pages/Contact';
-import About from './Pages/About';
-import Home from './Pages/Home';
+import AddPetPage from './Pages/AddPetPage';
+import UpdatePetPage from './Pages/UpdatePetPage';
+import PetListPage from './Pages/PetListPage';
 
-const App: React.FC = () => {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <div className="min-h-screen bg-gray-50 font-sans antialiased">
+        {/* Navbar will always be visible */}
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/add-pet" element={<AddPetPage />} />
+            <Route path="/update-pet/:petId" element={<UpdatePetPage />} />
+            <Route path="/pets" element={<PetListPage />} />
+            <Route path="/" element={<PetListPage />} />{' '}
+            {/* Default route to pet list */}
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
-};
-
-export default App;
+}
