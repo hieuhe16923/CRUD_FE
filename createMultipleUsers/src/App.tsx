@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import UserFormSingle from "./features/users/UserFormSingle";
+import UserFormMultiple from "./features/users/UserFormMultiple";
+import UsersList from "./features/users/UsersList";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [activeForm, setActiveForm] = useState<"single" | "multiple">("single");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="container py-4">
+      <h2 className="mb-4">Batch User Admin</h2>
 
-export default App
+      {/* Button Group Toggle */}
+      <div className="mb-4">
+        <div
+          className="btn-group"
+          role="group"
+          aria-label="Select input form type"
+        >
+          <input
+            type="radio"
+            className="btn-check"
+            name="formType"
+            id="btnSingle"
+            autoComplete="off"
+            checked={activeForm === "single"}
+            onChange={() => setActiveForm("single")}
+          />
+          <label className="btn btn-outline-primary" htmlFor="btnSingle">
+            Single User Input
+          </label>
+
+          <input
+            type="radio"
+            className="btn-check"
+            name="formType"
+            id="btnMultiple"
+            autoComplete="off"
+            checked={activeForm === "multiple"}
+            onChange={() => setActiveForm("multiple")}
+          />
+          <label className="btn btn-outline-primary" htmlFor="btnMultiple">
+            Multiple Users Input
+          </label>
+        </div>
+      </div>
+
+      <div className="row">
+        <div>
+          {activeForm === "single" ? <UserFormSingle /> : <UserFormMultiple />}
+        </div>
+        <div>
+          <UsersList />
+        </div>
+      </div>
+    </div>
+  );
+}
