@@ -1,0 +1,10 @@
+
+/* src/index.css */
+body {
+  background: #f8f9fa;
+}
+
+
+.btn-disabled-cursor:disabled {
+  cursor: not-allowed !important;
+}
