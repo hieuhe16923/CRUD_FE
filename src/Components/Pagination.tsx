@@ -6,9 +6,14 @@ const PaginationComponent: React.FC<PaginationProps> = ({
   currentPage,
   setCurrentPage,
 }) => {
-  const recordsPerPage = 10;
+  const recordsPerPage = meta?.pagination?.recordsPerPage || 10;
   const totalRecords = meta?.pagination?.records ?? 0;
   const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+  // Don't render pagination if there's only 1 page or no records
+  if (totalPages <= 1) {
+    return null;
+  }
 
   const createPageButton = (page: number) => (
     <button
@@ -38,6 +43,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
         key="prev"
         onClick={() => setCurrentPage(currentPage - 1)}
         className="min-w-[44px] h-11 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        aria-label="Previous page"
       >
         ←
       </button>
@@ -56,7 +62,11 @@ const PaginationComponent: React.FC<PaginationProps> = ({
 
     if (showLeftEllipsis) {
       buttons.push(
-        <span key="start-ellipsis" className="px-2 py-2 text-gray-400">
+        <span
+          key="start-ellipsis"
+          className="px-2 py-2 text-gray-400"
+          aria-hidden="true"
+        >
           ...
         </span>
       );
@@ -71,7 +81,11 @@ const PaginationComponent: React.FC<PaginationProps> = ({
 
     if (showRightEllipsis) {
       buttons.push(
-        <span key="end-ellipsis" className="px-2 py-2 text-gray-400">
+        <span
+          key="end-ellipsis"
+          className="px-2 py-2 text-gray-400"
+          aria-hidden="true"
+        >
           ...
         </span>
       );
@@ -89,6 +103,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
         key="next"
         onClick={() => setCurrentPage(currentPage + 1)}
         className="min-w-[44px] h-11 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        aria-label="Next page"
       >
         →
       </button>
@@ -100,7 +115,12 @@ const PaginationComponent: React.FC<PaginationProps> = ({
       <div className="text-sm text-gray-600">
         Page {currentPage} of {totalPages} • {totalRecords} results
       </div>
-      <div className="flex flex-wrap justify-center gap-2">{buttons}</div>
+      <nav
+        className="flex flex-wrap justify-center gap-2"
+        aria-label="Pagination"
+      >
+        {buttons}
+      </nav>
     </div>
   );
 };

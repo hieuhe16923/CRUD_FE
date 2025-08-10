@@ -1,9 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Navbar from './Components/Navbar';
-import TodoList from './Pages/Todolist';
-import WatchStop from './Pages/stopwatch';
 import Home from './Pages/Home/Home';
-import BreedsApp from './Pages/Breedlist/Breed.tsx';
+import OrderForm from './Pages/PlaceOrder/Placeorder.tsx';
+import Navbar from './Components/Navbar/index.tsx';
 
 const App: React.FC = () => {
   return (
@@ -11,9 +9,7 @@ const App: React.FC = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/todolist" element={<TodoList />} />
-        <Route path="/watchstop" element={<WatchStop />} />
-        <Route path="/breed" element={<BreedsApp />} />
+        <Route path="/place-order" element={<OrderForm />} />
       </Routes>
     </BrowserRouter>
   );

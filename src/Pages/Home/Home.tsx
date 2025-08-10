@@ -1,85 +1,84 @@
-import React, { useState } from 'react';
-import ValidatedInput from '../../Components/Inputform/Input';
-import { validateEmail, validatePassword } from '../../Utils/validate';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPets } from '../../redux/api/api';
+import { buyPet } from '../../redux/slices/petsSlice';
+import PaginationComponent from './../../Components/Pagination';
+import BreedItem from './../../Components/Breeds/BreedItem';
+import Loading from '../../Components/Loading';
+import ErrorPage from '../../Components/Errors';
 
-const Home: React.FC = () => {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+const Home = () => {
+  const dispatch = useDispatch();
+  const { list, loading, error } = useSelector(state => state.pets);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 9;
 
-  const email = form.email;
-  const password = form.password;
-
-  const setEmail = (value: string) => setForm({ ...form, email: value });
-  const setPassword = (value: string) => setForm({ ...form, password: value });
-
-  const handleSubmit = () => {
-    setSubmitted(true);
-
-    const emailError = validateEmail(email);
-
-    const passwordError = validatePassword(password);
-
-    if (emailError) {
-      document.getElementById('email')?.focus();
-    } else if (passwordError) {
-      document.getElementById('password')?.focus();
-    }
-
-    if (!emailError && !passwordError) {
-      alert('Form submitted successfully!');
-    }
-    if (emailError) {
-      alert(`${emailError}`);
-    }
-    if (passwordError) {
-      alert(`${passwordError}`);
-    }
+  const handlePageChange = newPage => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  return (
-    <div className="h-screen flex items-center bg-gray-100">
-      <div className="p-4 max-w-md mx-auto w-full bg-white rounded-md shadow-md">
-        <h1 className="text-xl font-semibold mb-4 text-center">
-          Validation Form
-        </h1>
+  useEffect(() => {
+    dispatch(fetchPets());
+  }, [dispatch]);
 
-        <form
-          onSubmit={e => {
-            e.preventDefault(); // Ngăn reload
-            handleSubmit();
-          }}
-        >
-          <ValidatedInput
-            id="email"
-            label="Email"
-            placeholder="example@email.com"
-            value={email}
-            setValue={setEmail}
-            validationFn={validateEmail}
-            submitted={submitted}
-          />
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = list.slice(indexOfFirstRecord, indexOfLastRecord);
 
-          <ValidatedInput
-            id="password"
-            label="Password"
-            value={password}
-            setValue={setPassword}
-            validationFn={validatePassword}
-            submitted={submitted}
-            type="password"
-          />
+  const meta = {
+    pagination: {
+      records: list.length,
+      recordsPerPage,
+    },
+  };
 
-          <button
-            type="submit"
-            className="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Submit
-          </button>
-        </form>
+  if (loading) {
+    return (
+      <div>
+        <Loading />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <ErrorPage message={error} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-center">Pet Store</h1>
+
+      {currentRecords.length === 0 ? (
+        <div className="text-center text-gray-600 py-8">No pets available</div>
+      ) : (
+        <>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {currentRecords.map((pet, index) => (
+              <div key={`${pet.id || 'noid'}-${indexOfFirstRecord + index}`}>
+                <BreedItem
+                  name={pet.name || 'Unnamed'}
+                  description={pet.category?.name || 'No description available'}
+                  life={pet.life || null}
+                  male_weight={pet.male_weight || null}
+                  female_weight={pet.female_weight || null}
+                  onBuy={() => dispatch(buyPet(pet))}
+                />
+              </div>
+            ))}
+          </ul>
+
+          <PaginationComponent
+            meta={meta}
+            currentPage={currentPage}
+            setCurrentPage={handlePageChange}
+          />
+        </>
+      )}
     </div>
   );
 };

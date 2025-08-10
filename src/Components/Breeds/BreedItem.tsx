@@ -1,12 +1,17 @@
 import React from 'react';
 import { BreedItemProps } from '../../Types/Breeds';
 
-const BreedItem: React.FC<BreedItemProps> = ({
+interface BreedItemExtendedProps extends BreedItemProps {
+  onBuy?: () => void; // thêm prop mới cho nút Buy
+}
+
+const BreedItem: React.FC<BreedItemExtendedProps> = ({
   name,
   description,
   life,
   male_weight,
   female_weight,
+  onBuy,
 }) => {
   return (
     <li className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 overflow-hidden">
@@ -77,7 +82,14 @@ const BreedItem: React.FC<BreedItemProps> = ({
             </div>
           )}
         </div>
-
+        {onBuy && (
+          <button
+            onClick={onBuy}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors mt-4"
+          >
+            Buy
+          </button>
+        )}
         {/* Bottom accent line */}
         <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
       </div>
