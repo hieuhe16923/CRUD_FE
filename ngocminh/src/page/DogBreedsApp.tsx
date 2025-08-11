@@ -16,7 +16,7 @@ const DogBreedsApp: React.FC = () => {
     const [paginationLoading, setPaginationLoading] = useState(false); // Thêm loading riêng cho pagination
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(3);
+    const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(6);
     const isOnline = useOnlineStatus();
 
     const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
@@ -105,7 +105,8 @@ const DogBreedsApp: React.FC = () => {
     };
 
     return (
-        <div className="min-vh-100 bg-light">
+        <div className="bg-light" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: '1 0 auto' }}>
             {(loading || paginationLoading) && <LoadingBar />}
 
             {/* Header - sẽ có container riêng bên trong */}
@@ -157,37 +158,9 @@ const DogBreedsApp: React.FC = () => {
                             <div className="row g-4 mb-4">
                                 {paginationLoading ? (
                                     // Hiển thị loading skeleton cho pet cards
-                                    Array.from({ length: itemsPerPage }).map((_, index) => (
-                                        <div key={`loading-${index}`} className="col-lg-4 col-md-6 col-sm-12">
-                                            <div className="card h-100 shadow-sm">
-                                                <div className="card-header bg-white d-flex justify-content-center align-items-center border-bottom" style={{ minHeight: '60px' }}>
-                                                    <div className="d-flex justify-content-center align-items-center">
-                                                        <div
-                                                            className="spinner-border text-primary"
-                                                            role="status"
-                                                            style={{ width: '1.5rem', height: '1.5rem' }}
-                                                        >
-                                                            <span className="visually-hidden">Loading...</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="card-body">
-                                                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-                                                        <div className="text-center">
-                                                            <div
-                                                                className="spinner-border text-success mb-2"
-                                                                role="status"
-                                                                style={{ width: '2rem', height: '2rem' }}
-                                                            >
-                                                                <span className="visually-hidden">Loading...</span>
-                                                            </div>
-                                                            <div className="text-muted small">Đang tải...</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
+                                    <div className="d-flex justify-content-center py-5 w-100">
+                                        <LoadingSpinner />
+                                    </div>
                                 ) : (
                                     // Hiển thị pet cards bình thường
                                     currentPets.map((pet, index) => (
@@ -211,9 +184,9 @@ const DogBreedsApp: React.FC = () => {
                     )}
                 </div>
             </div>
-
+            </div>
             {/* Footer - Dùng Bootstrap classes */}
-            <footer className="bg-white border-top mt-5">
+            <footer className="bg-white border-top mt-5" style={{ flexShrink: 0 }}>
                 <div className="container" style={{ maxWidth: '1200px' }}>
                     <div className="py-4">
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
