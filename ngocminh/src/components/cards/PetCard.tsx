@@ -22,22 +22,10 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
         return defaultImage;
     };
 
-    const getAnimalEmoji = (categoryName?: string): string => {
-        if (!categoryName) return '🐾';
-        const category = categoryName.toLowerCase();
-        if (category.includes('dog')) return '🐕';
-        if (category.includes('cat')) return '🐱';
-        if (category.includes('bird')) return '🐦';
-        if (category.includes('fish')) return '🐟';
-        if (category.includes('rabbit')) return '🐰';
-        if (category.includes('guinea')) return '🐹';
-        return '🐾';
-    };
-
     const statusColors: Record<Status, string> = {
-        available: '#28a745',
-        pending: '#ffc107',
-        sold: '#dc3545'
+        available: 'success',
+        pending: 'warning',
+        sold: 'danger'
     };
 
     const statusLabels: Record<Status, string> = {
@@ -50,149 +38,62 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
     const displayStatus: Status = pet.status || 'sold';
 
     return (
-        <div
-            style={{
-                border: '1px solid #e0e0e0',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                backgroundColor: 'white',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                cursor: 'pointer',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-            onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-            }}
-            onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-            }}
-        >
+        <div className="card h-100 shadow-sm" style={{ transition: 'transform 0.2s' }}
+             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+
             {/* Header với ID và menu */}
-            <div style={{
-                padding: '12px 16px',
-                borderBottom: '1px solid #f0f0f0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <span style={{
-                    color: '#666',
-                    fontSize: '12px',
-                    fontWeight: '500'
-                }}>
-                    {String(pet.id)}
-                </span>
-                <span style={{
-                    color: '#666',
-                    fontSize: '16px',
-                    cursor: 'pointer'
-                }}>
-                    •••
-                </span>
+            <div className="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                <small className="text-muted fw-medium">{String(pet.id)}</small>
+                <span className="text-muted" style={{ cursor: 'pointer' }}>•••</span>
             </div>
 
-            {/* Pet Image với icon */}
-            <div style={{
-                position: 'relative',
-                height: '180px',
-                overflow: 'hidden'
-            }}>
-                <img
-                    src={getCategoryImage(pet.category?.name)}
-                    alt={pet.name || 'Pet'}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                    }}
-                />
+            {/* Pet Info Section - theo figma: ảnh tròn và text cạnh nhau */}
+            <div className="card-body">
+                <div className="d-flex align-items-center mb-3">
+                    {/* Circular pet image - theo figma */}
+                    <div className="rounded-circle overflow-hidden me-3 border"
+                         style={{
+                             width: '60px',
+                             height: '60px',
+                             minWidth: '60px',
+                             flexShrink: 0
+                         }}>
+                        <img
+                            src={getCategoryImage(pet.category?.name)}
+                            alt={pet.name || 'Pet'}
+                            className="w-100 h-100"
+                            style={{ objectFit: 'cover' }}
+                        />
+                    </div>
 
-                <div style={{
-                    position: 'absolute',
-                    top: '12px',
-                    left: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '20px'
-                }}>
-                    {getAnimalEmoji(pet.category?.name)}
+                    {/* Pet name và category cạnh ảnh - theo figma */}
+                    <div className="flex-grow-1">
+                        <h5 className="card-title mb-1 fw-semibold" style={{ fontSize: '1.1rem' }}>
+                            {pet.name || 'Không có tên'}
+                        </h5>
+                        <small className="text-muted" style={{ fontSize: '0.875rem' }}>
+                            {pet.category?.name || 'Không rõ loại'}
+                        </small>
+                    </div>
                 </div>
-            </div>
 
-            {/* Pet Info */}
-            <div style={{
-                padding: '16px',
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                {/* Tên và loại */}
-                <h3 style={{
-                    margin: '0 0 4px 0',
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    color: '#333'
-                }}>
-                    {pet.name || 'Không có tên'}
-                </h3>
-
-                <p style={{
-                    margin: '0 0 12px 0',
-                    fontSize: '14px',
-                    color: '#666'
-                }}>
-                    {pet.category?.name || 'Không rõ loại'}
-                </p>
-
-                {/* Tags */}
+                {/* Tags section */}
                 {pet.tags && pet.tags.length > 0 && (
-                    <div style={{ marginBottom: '12px' }}>
-                        <div style={{
-                            fontSize: '12px',
-                            color: '#666',
-                            marginBottom: '6px'
-                        }}>
-                            Thẻ:
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '4px'
-                        }}>
+                    <div className="mb-3">
+                        <small className="text-muted d-block mb-2">Thẻ:</small>
+                        <div className="d-flex flex-wrap gap-1">
                             {pet.tags.slice(0, 3).map((tag, index) => (
                                 <span
                                     key={index}
-                                    style={{
-                                        backgroundColor: '#f0f8f0',
-                                        color: '#2d5a2d',
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        fontSize: '11px',
-                                        fontWeight: '500'
-                                    }}
+                                    className="badge bg-light text-success border"
+                                    style={{ fontSize: '0.7em' }}
                                 >
                                     {tag.name || 'Không rõ tag'}
                                 </span>
                             ))}
                             {pet.tags.length > 3 && (
-                                <span style={{
-                                    backgroundColor: '#f0f8f0',
-                                    color: '#2d5a2d',
-                                    padding: '2px 8px',
-                                    borderRadius: '12px',
-                                    fontSize: '11px',
-                                    fontWeight: '500'
-                                }}>
+                                <span className="badge bg-light text-success border" style={{ fontSize: '0.7em' }}>
                                     +{pet.tags.length - 3}
                                 </span>
                             )}
@@ -201,23 +102,9 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
                 )}
 
                 {/* Status - đặt ở cuối */}
-                <div style={{ marginTop: 'auto' }}>
-                    <div style={{
-                        fontSize: '12px',
-                        color: '#666',
-                        marginBottom: '6px'
-                    }}>
-                        Trạng thái:
-                    </div>
-                    <span style={{
-                        backgroundColor: statusColors[displayStatus],
-                        color: 'white',
-                        padding: '4px 10px',
-                        borderRadius: '12px',
-                        fontSize: '11px',
-                        fontWeight: '500',
-                        display: 'inline-block'
-                    }}>
+                <div className="mt-auto">
+                    <small className="text-muted d-block mb-2">Trạng thái:</small>
+                    <span className={`badge bg-${statusColors[displayStatus]} text-white`}>
                         {statusLabels[displayStatus]}
                     </span>
                 </div>

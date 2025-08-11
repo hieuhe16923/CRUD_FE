@@ -1,5 +1,4 @@
 import React from 'react';
-
 import type { Status, ItemsPerPage } from '../../types';
 
 interface StatusFilterProps {
@@ -17,7 +16,6 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
                                                               loading,
                                                               itemsPerPage,
                                                               onItemsPerPageChange,
-                                                              totalItems,
                                                           }) => {
     const statusLabels: Record<Status, string> = {
         available: 'Có sẵn',
@@ -25,56 +23,106 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
         sold: 'Đã bán'
     };
 
-    const statusColors: Record<Status, string> = {
-        available: 'success',
-        pending: 'warning',
-        sold: 'danger'
+    const statusButtonClass: Record<Status, string> = {
+        available: 'btn-success',
+        pending: 'btn-warning',
+        sold: 'btn-danger'
     };
 
     return (
-        <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-            <div className="d-flex flex-wrap gap-2">
+        <div className="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-sm-nowrap">
+            {/* Status filter buttons - responsive với CSS */}
+            <div className="btn-group" role="group" style={{
+                backgroundColor: '#f8f9fa',
+                padding: '2px',
+                borderRadius: '6px',
+                border: '1px solid #dee2e6',
+                flexShrink: 0
+            }}>
                 {(Object.keys(statusLabels) as Status[]).map((status) => (
                     <button
                         key={status}
                         type="button"
-                        className={`btn ${
+                        className={`btn btn-sm border-0 ${
                             currentStatus === status
-                                ? `btn-${statusColors[status]}`
-                                : `btn-outline-${statusColors[status]}`
+                                ? `${statusButtonClass[status]} text-white`
+                                : 'btn-light text-muted'
                         }`}
                         onClick={() => onStatusChange(status)}
                         disabled={loading}
+                        style={{
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            backgroundColor: currentStatus === status
+                                ? (status === 'available' ? '#28a745' : status === 'pending' ? '#ffc107' : '#dc3545')
+                                : 'transparent',
+                            minWidth: '0',
+                            whiteSpace: 'nowrap'
+                        }}
                     >
                         {loading && currentStatus === status && (
-                            <span className="spinner-border spinner-border-sm me-2" />
+                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                         )}
-                        {statusLabels[status]}
+                        {/* Responsive text - ẩn/hiện theo screen size */}
+                        <span className="d-none d-sm-inline">{statusLabels[status]}</span>
+                        <span className="d-inline d-sm-none">
+                            {status === 'available' ? 'Sẵn' : status === 'pending' ? 'Chờ' : 'Bán'}
+                        </span>
                     </button>
                 ))}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span>Hiển thị:</span>
+            {/* Items per page selector - responsive */}
+            <div
+                className="position-relative"
+                style={{
+                    border: '1px solid #dee2e6',
+                    borderRadius: '6px',
+                    backgroundColor: 'white',
+                    flexShrink: 0
+                }}
+            >
                 <select
+                    className="form-select border-0"
                     value={itemsPerPage}
                     onChange={(e) =>
                         onItemsPerPageChange(Number(e.target.value) as ItemsPerPage)
                     }
                     style={{
-                        padding: '4px 8px',
-                        borderRadius: '8px',
-                        border: '1px solid #ccc',
-                        fontSize: '14px',
+                        background: 'transparent',
+                        fontSize: '0.75rem',
+                        minWidth: '50px',
+                        padding: '4px 20px 4px 8px',
+                        appearance: 'none',
+                        outline: 'none'
                     }}
                 >
-                    <option value={3}>3</option>
-                    <option value={6}>6</option>
-                    <option value={9}>9</option>
+                    {/* Chỉ hiển thị số trên mobile, đầy đủ trên desktop */}
+                    <option value={3}>
+                        <span className="d-none d-md-inline">3 mục</span>
+                        {/*<span className="d-inline d-md-none">3</span>*/}
+                    </option>
+                    <option value={6}>
+                        <span className="d-none d-md-inline">6 mục</span>
+                        {/*<span className="d-inline d-md-none">6</span>*/}
+                    </option>
+                    <option value={9}>
+                        <span className="d-none d-md-inline">9 mục</span>
+                        {/*<span className="d-inline d-md-none">9</span>*/}
+                    </option>
                 </select>
-                <span style={{ color: '#666', fontSize: '14px' }}>
-                    ({totalItems} tổng cộng)
-                </span>
+                {/* Custom dropdown arrow */}
+                <div style={{
+                    position: 'absolute',
+                    right: '6px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    fontSize: '0.6rem',
+                    color: '#6c757d'
+                }}>
+                    ▼
+                </div>
             </div>
         </div>
     );

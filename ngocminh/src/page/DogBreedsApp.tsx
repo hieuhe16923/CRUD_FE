@@ -4,7 +4,6 @@ import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { petService } from '../services/petService';
 import { LoadingSpinner, LoadingBar } from '../components/common/Loading';
 import { ErrorAlert, OfflineAlert } from '../components/common/Alerts';
-// import { StatusFilter } from '../components/filters/StatusFilter';
 import { PetCard } from '../components/cards/PetCard';
 import { Pagination } from '../components/pagination/Pagination';
 import { Header } from '../components/layout/Header';
@@ -23,7 +22,6 @@ const DogBreedsApp: React.FC = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentPets = filteredPets.slice(startIndex, endIndex);
-
 
     const fetchPets = async (status: Status, signal: AbortSignal) => {
         if (!isOnline) {
@@ -96,14 +94,10 @@ const DogBreedsApp: React.FC = () => {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            backgroundColor: '#f8f9fa',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-        }}>
+        <div className="min-vh-100 bg-light">
             {loading && <LoadingBar />}
 
-            {/* Header mới */}
+            {/* Header - sẽ có container riêng bên trong */}
             <Header
                 isOnline={isOnline}
                 currentStatus={currentStatus}
@@ -114,128 +108,91 @@ const DogBreedsApp: React.FC = () => {
                 totalItems={filteredPets.length}
             />
 
-
-            {/* Main Content */}
-            <div style={{
-                maxWidth: '1200px',
-                margin: '0 auto',
-                padding: '24px 20px'
-            }}>
-                {!isOnline && <OfflineAlert />}
-
-                {error && (
-                    <ErrorAlert
-                        message={error}
-                        onRetry={isOnline ? handleRetry : undefined}
-                    />
-                )}
-
-                {loading && <LoadingSpinner />}
-
-                {!loading && !error && filteredPets.length === 0 && (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '60px 0',
-                        color: '#666'
-                    }}>
-                        <div style={{ fontSize: '48px', marginBottom: '16px' }}>🐾</div>
-                        <h4 style={{ marginBottom: '8px', color: '#333' }}>Không có dữ liệu</h4>
-                        <p>Không tìm thấy động vật nào với trạng thái này.</p>
-                    </div>
-                )}
-
-                {!loading && !error && currentPets.length > 0 && (
-                    <>
-                        {/* Pet Grid với style mới */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 340px))',
-                            justifyContent: 'center',
-                            gap: '24px',
-                            marginBottom: '32px'
-                        }}>
-                            {currentPets.map((pet, index) => (
-                                <PetCard key={`${pet.id}-${index}`} pet={pet} />
-                            ))}
+            {/* Main Content - QUAN TRỌNG: Dùng cùng container với Header */}
+            <div className="container" style={{ maxWidth: '1200px' }}>
+                <div className="py-4">
+                    {!isOnline && (
+                        <div className="mb-4">
+                            <OfflineAlert />
                         </div>
+                    )}
 
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    </>
-                )}
+                    {error && (
+                        <div className="mb-4">
+                            <ErrorAlert
+                                message={error}
+                                onRetry={isOnline ? handleRetry : undefined}
+                            />
+                        </div>
+                    )}
+
+                    {loading && (
+                        <div className="d-flex justify-content-center py-5">
+                            <LoadingSpinner />
+                        </div>
+                    )}
+
+                    {!loading && !error && filteredPets.length === 0 && (
+                        <div className="text-center py-5">
+                            <div style={{ fontSize: '48px' }} className="mb-3">🐾</div>
+                            <h4 className="mb-2 text-dark">Không có dữ liệu</h4>
+                            <p className="text-muted">Không tìm thấy động vật nào với trạng thái này.</p>
+                        </div>
+                    )}
+
+                    {!loading && !error && currentPets.length > 0 && (
+                        <>
+                            {/* Pet Grid - Dùng Bootstrap Grid System */}
+                            <div className="row g-4 mb-4">
+                                {currentPets.map((pet, index) => (
+                                    <div key={`${pet.id}-${index}`} className="col-lg-4 col-md-6 col-sm-12">
+                                        <PetCard pet={pet} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="d-flex justify-content-center">
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                />
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
-            {/* Footer mới */}
-            <footer style={{
-                backgroundColor: 'white',
-                borderTop: '1px solid #e0e0e0',
-                padding: '24px 0',
-                marginTop: '48px'
-            }}>
-                <div style={{
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    padding: '0 20px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: '16px'
-                }}>
-                    <div style={{ display: 'flex', gap: '24px' }}>
-                        <a href="#" style={{
-                            color: '#666',
-                            textDecoration: 'none',
-                            fontSize: '14px'
-                        }}>
-                            Tài nguyên
-                        </a>
-                        <a href="#" style={{
-                            color: '#666',
-                            textDecoration: 'none',
-                            fontSize: '14px'
-                        }}>
-                            Công ty
-                        </a>
+            {/* Footer - Dùng Bootstrap classes */}
+            <footer className="bg-white border-top mt-5">
+                <div className="container" style={{ maxWidth: '1200px' }}>
+                    <div className="py-4">
+                        <div className="d-flex justify-content-between align-items-center flex-wrap">
+                            <div className="d-flex gap-4">
+                                <a href="#" className="text-muted text-decoration-none small">
+                                    Tài nguyên
+                                </a>
+                                <a href="#" className="text-muted text-decoration-none small">
+                                    Công ty
+                                </a>
+                            </div>
+                            <div className="d-flex gap-3 align-items-center">
+                                <a href="#" className="text-muted text-decoration-none fs-5">
+                                    📘
+                                </a>
+                                <a href="#" className="text-muted text-decoration-none fs-5">
+                                    🐦
+                                </a>
+                                <a href="#" className="text-muted text-decoration-none fs-5">
+                                    💼
+                                </a>
+                            </div>
+                        </div>
+                        <div className="mt-3 d-flex align-items-center gap-2">
+                            <small className="text-muted">Made with 💙 Visily</small>
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                        <a href="#" style={{
-                            color: '#666',
-                            fontSize: '20px',
-                            textDecoration: 'none'
-                        }}>
-                            📘
-                        </a>
-                        <a href="#" style={{
-                            color: '#666',
-                            fontSize: '20px',
-                            textDecoration: 'none'
-                        }}>
-                            🐦
-                        </a>
-                        <a href="#" style={{
-                            color: '#666',
-                            fontSize: '20px',
-                            textDecoration: 'none'
-                        }}>
-                            💼
-                        </a>
-                    </div>
-                </div>
-                <div style={{
-                    maxWidth: '1200px',
-                    margin: '16px auto 0',
-                    padding: '0 20px',
-                    fontSize: '12px',
-                    color: '#999',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                }}>
-                    Made with 💙 Visily
                 </div>
             </footer>
         </div>

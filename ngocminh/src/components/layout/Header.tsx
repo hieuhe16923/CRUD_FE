@@ -23,94 +23,80 @@ export const Header: React.FC<HeaderProps> = ({
                                                   totalItems,
                                               }) => {
 
+    const statusLabels: Record<Status, string> = {
+        available: 'có sẵn',
+        pending: 'đang chờ',
+        sold: 'đã bán'
+    };
+
     return (
-        <div style={{
-            backgroundColor: 'white',
-            borderBottom: '1px solid #e0e0e0',
-            padding: '16px 0'
-        }}>
-            <div style={{
-                maxWidth: '1200px',
-                margin: '0 auto',
-                padding: '0 20px'
-            }}>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%'
-                }}>
-                    {/* Logo và tiêu đề */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
-                        <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: '12px',
-                            fontSize: '20px'
-                        }}>
-                            🐾
+        <div className="bg-white border-bottom">
+            {/* Container với padding để thẳng hàng với cards */}
+            <div className="container" style={{ maxWidth: '1200px' }}>
+                <div className="row py-3">
+                    <div className="col-12">
+                        {/* Top nav with logo and nav links */}
+                        <div className="d-flex align-items-center justify-content-between mb-3">
+                            {/* Logo and nav links */}
+                            <div className="d-flex align-items-center">
+                                <span className="me-3" style={{ fontSize: '24px' }}>🐾</span>
+                                <nav className="d-flex gap-4">
+                                    <button
+                                        className={`btn btn-link text-decoration-none p-0 ${currentStatus === 'available' ? 'text-success fw-semibold' : 'text-muted'}`}
+                                        onClick={() => onStatusChange('available')}
+                                    >
+                                        Có sẵn
+                                    </button>
+                                    <button
+                                        className={`btn btn-link text-decoration-none p-0 ${currentStatus === 'pending' ? 'text-warning fw-semibold' : 'text-muted'}`}
+                                        onClick={() => onStatusChange('pending')}
+                                    >
+                                        Đang chờ
+                                    </button>
+                                    <button
+                                        className={`btn btn-link text-decoration-none p-0 ${currentStatus === 'sold' ? 'text-danger fw-semibold' : 'text-muted'}`}
+                                        onClick={() => onStatusChange('sold')}
+                                    >
+                                        Đã bán
+                                    </button>
+                                </nav>
+                            </div>
+
+                            {/* Online status */}
+                            <div className="d-flex align-items-center">
+                                {isOnline ? (
+                                    <div className="d-flex align-items-center text-success">
+                                        <Wifi size={16} className="me-2" />
+                                        <small>Online</small>
+                                    </div>
+                                ) : (
+                                    <div className="d-flex align-items-center text-warning">
+                                        <WifiOff size={16} className="me-2" />
+                                        <small>Offline</small>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <h1 style={{
-                            margin: 0,
-                            fontSize: '24px',
-                            fontWeight: '600',
-                            color: '#333'
-                        }}>
-                            Động vật
-                        </h1>
-                    </div>
 
-                    {/* Status kết nối */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
-                        {isOnline ? (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                color: '#28a745',
-                                fontSize: '14px'
-                            }}>
-                                <Wifi size={16} style={{ marginRight: '6px' }} />
-                                <span>Online</span>
+                        {/* Page title and filters - thẳng hàng với cards */}
+                        <div className="d-flex align-items-center justify-content-between">
+                            <h1 className="h4 mb-0">
+                                Động vật {statusLabels[currentStatus]}
+                            </h1>
+
+                            {/* Filter section - thẳng hàng với edge của cards */}
+                            <div className="d-flex align-items-center gap-3">
+                                <StatusFilter
+                                    currentStatus={currentStatus}
+                                    onStatusChange={onStatusChange}
+                                    loading={loading}
+                                    itemsPerPage={itemsPerPage}
+                                    onItemsPerPageChange={onItemsPerPageChange}
+                                    totalItems={totalItems}
+                                />
                             </div>
-                        ) : (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                color: '#ffc107',
-                                fontSize: '14px'
-                            }}>
-                                <WifiOff size={16} style={{ marginRight: '6px' }} />
-                                <span>Offline</span>
-                            </div>
-                        )}
+                        </div>
                     </div>
-                </div>
-
-                {/* Status Filter */}
-                <div style={{
-                    marginTop: '16px',
-                    borderTop: '1px solid #f0f0f0',
-                    paddingTop: '16px'
-                }}>
-                    <StatusFilter
-                        currentStatus={currentStatus}
-                        onStatusChange={onStatusChange}
-                        loading={loading}
-                        itemsPerPage={itemsPerPage}
-                        onItemsPerPageChange={onItemsPerPageChange}
-                        totalItems={totalItems}
-                    />
-
                 </div>
             </div>
         </div>
