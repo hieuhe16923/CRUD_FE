@@ -78,10 +78,10 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
                     </div>
                 </div>
 
-                {/* Tags section */}
-                {pet.tags && pet.tags.length > 0 && (
-                    <div className="mb-3">
-                        <small className="text-muted d-block mb-2">Thẻ:</small>
+                {/* Tags section - luôn giữ label */}
+                <div className="mb-3">
+                    <small className="text-muted d-block mb-2">Thẻ:</small>
+                    {pet.tags && pet.tags.length > 0 ? (
                         <div className="d-flex flex-wrap gap-1">
                             {pet.tags.slice(0, 3).map((tag, index) => (
                                 <span
@@ -98,8 +98,10 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
                                 </span>
                             )}
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <small className="text-muted">Không có thẻ</small>
+                    )}
+                </div>
 
                 {/* Status - đặt ở cuối */}
                 <div className="mt-auto">

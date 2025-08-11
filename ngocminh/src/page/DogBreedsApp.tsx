@@ -13,6 +13,7 @@ const DogBreedsApp: React.FC = () => {
     const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
     const [currentStatus, setCurrentStatus] = useState<Status>('available');
     const [loading, setLoading] = useState(false);
+    const [paginationLoading, setPaginationLoading] = useState(false); // Thêm loading riêng cho pagination
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(3);
@@ -78,9 +79,19 @@ const DogBreedsApp: React.FC = () => {
         setCurrentStatus(status);
     };
 
-    const handlePageChange = (page: number) => {
+    const handlePageChange = async (page: number) => {
+        if (paginationLoading) return; // Ngăn chặn multiple clicks
+
+        setPaginationLoading(true);
+
+        // Tăng loading delay từ 300ms lên 500ms để thấy rõ hơn
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         setCurrentPage(page);
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
+        setPaginationLoading(false);
+
+        // Scroll to top với animation mượt
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleItemsPerPageChange = (items: ItemsPerPage) => {
@@ -95,7 +106,7 @@ const DogBreedsApp: React.FC = () => {
 
     return (
         <div className="min-vh-100 bg-light">
-            {loading && <LoadingBar />}
+            {(loading || paginationLoading) && <LoadingBar />}
 
             {/* Header - sẽ có container riêng bên trong */}
             <Header
@@ -144,19 +155,56 @@ const DogBreedsApp: React.FC = () => {
                         <>
                             {/* Pet Grid - Dùng Bootstrap Grid System */}
                             <div className="row g-4 mb-4">
-                                {currentPets.map((pet, index) => (
-                                    <div key={`${pet.id}-${index}`} className="col-lg-4 col-md-6 col-sm-12">
-                                        <PetCard pet={pet} />
-                                    </div>
-                                ))}
+                                {paginationLoading ? (
+                                    // Hiển thị loading skeleton cho pet cards
+                                    Array.from({ length: itemsPerPage }).map((_, index) => (
+                                        <div key={`loading-${index}`} className="col-lg-4 col-md-6 col-sm-12">
+                                            <div className="card h-100 shadow-sm">
+                                                <div className="card-header bg-white d-flex justify-content-center align-items-center border-bottom" style={{ minHeight: '60px' }}>
+                                                    <div className="d-flex justify-content-center align-items-center">
+                                                        <div
+                                                            className="spinner-border text-primary"
+                                                            role="status"
+                                                            style={{ width: '1.5rem', height: '1.5rem' }}
+                                                        >
+                                                            <span className="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body">
+                                                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
+                                                        <div className="text-center">
+                                                            <div
+                                                                className="spinner-border text-success mb-2"
+                                                                role="status"
+                                                                style={{ width: '2rem', height: '2rem' }}
+                                                            >
+                                                                <span className="visually-hidden">Loading...</span>
+                                                            </div>
+                                                            <div className="text-muted small">Đang tải...</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    // Hiển thị pet cards bình thường
+                                    currentPets.map((pet, index) => (
+                                        <div key={`${pet.id}-${index}`} className="col-lg-4 col-md-6 col-sm-12">
+                                            <PetCard pet={pet} />
+                                        </div>
+                                    ))
+                                )}
                             </div>
 
-                            {/* Pagination */}
+                            {/* Pagination với loading state */}
                             <div className="d-flex justify-content-center">
                                 <Pagination
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
+                                    loading={paginationLoading}
                                 />
                             </div>
                         </>
