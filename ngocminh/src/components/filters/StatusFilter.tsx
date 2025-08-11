@@ -29,6 +29,17 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
         sold: 'btn-danger'
     };
 
+    // Tạo options text dựa trên screen size
+    // const getOptionsText = () => {
+    //     // Kiểm tra screen size (có thể dùng window.innerWidth hoặc CSS media queries)
+    //     const isMobile = window.innerWidth < 768;
+    //     return {
+    //         3: isMobile ? '3' : '3 mục',
+    //         6: isMobile ? '6' : '6 mục',
+    //         9: isMobile ? '9' : '9 mục'
+    //     };
+    // };
+
     return (
         <div className="d-flex align-items-center gap-2 gap-md-3 flex-wrap flex-sm-nowrap">
             {/* Status filter buttons - responsive với CSS */}
@@ -97,19 +108,10 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
                         outline: 'none'
                     }}
                 >
-                    {/* Chỉ hiển thị số trên mobile, đầy đủ trên desktop */}
-                    <option value={3}>
-                        <span className="d-none d-md-inline">3 mục</span>
-                        {/*<span className="d-inline d-md-none">3</span>*/}
-                    </option>
-                    <option value={6}>
-                        <span className="d-none d-md-inline">6 mục</span>
-                        {/*<span className="d-inline d-md-none">6</span>*/}
-                    </option>
-                    <option value={9}>
-                        <span className="d-none d-md-inline">9 mục</span>
-                        {/*<span className="d-inline d-md-none">9</span>*/}
-                    </option>
+                    {/* Chỉ sử dụng plain text, không có JSX elements */}
+                    <option value={3}>3 mục</option>
+                    <option value={6}>6 mục</option>
+                    <option value={9}>9 mục</option>
                 </select>
                 {/* Custom dropdown arrow */}
                 <div style={{
