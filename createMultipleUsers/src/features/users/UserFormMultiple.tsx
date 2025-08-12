@@ -9,7 +9,7 @@ import Alert from "../../components/Alert";
 
 export default function UserFormMultiple() {
   const dispatch = useAppDispatch();
-  const { error, success } = useAppSelector((s) => s.users);
+  const { error, success, tempUsers } = useAppSelector((s) => s.users);
 
   const [text, setText] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
@@ -67,13 +67,34 @@ export default function UserFormMultiple() {
       const valErrors: string[] = [];
       const validUsers: User[] = [];
 
+      // Lấy danh sách email hiện có trong store để check trùng
+      const existingEmails = tempUsers.map((u) => u.email.toLowerCase());
+
+      // Dùng set để kiểm tra email trong mảng input có bị trùng lặp hay không
+      const emailsInInput = new Set<string>();
+
       parsed.forEach((p: unknown, i: number) => {
         const user = p as User;
-        const e = validateUser(user);
+
+        // Kiểm tra email trùng trong input
+        const emailLower = user.email.toLowerCase();
+
+        if (emailsInInput.has(emailLower)) {
+          valErrors.push(`#${i + 1}: Email is duplicated in input`);
+          return;
+        }
+
+        emailsInInput.add(emailLower);
+
+        // Validate user với danh sách email đã có
+        const e = validateUser(user, existingEmails);
+
         if (e.length) {
           valErrors.push(`#${i + 1}: ${e.join(", ")}`);
         } else {
           validUsers.push(user);
+          // Thêm email này vào existingEmails để tránh trùng với user sau
+          existingEmails.push(emailLower);
         }
       });
 

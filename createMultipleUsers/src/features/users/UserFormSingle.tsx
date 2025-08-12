@@ -15,7 +15,10 @@ import Alert from "../../components/Alert";
 
 export default function UserFormSingle() {
   const dispatch = useAppDispatch();
-  const { tempUsers2, error, success } = useAppSelector((s) => s.users);
+  // Lấy tempUsers và tempUsers2 từ Redux state
+  const { tempUsers, tempUsers2, error, success } = useAppSelector(
+    (s) => s.users
+  );
 
   const [form, setForm] = useState<User>({
     username: "",
@@ -70,7 +73,16 @@ export default function UserFormSingle() {
   };
 
   const handleAdd = async () => {
-    const e = validateUser(form);
+    // Lấy danh sách email hiện có trong tempUsers và tempUsers2
+    const emailsFromTempUsers = tempUsers.map((u) => u.email);
+    const emailsFromTempUsers2 = tempUsers2.map((u) => u.email);
+
+    // Tạo mảng email đã có (union)
+    const existingEmails = [...emailsFromTempUsers, ...emailsFromTempUsers2];
+
+    // Gọi validateUser với existingEmails để check trùng email
+    const e = validateUser(form, existingEmails);
+
     if (e.length) {
       setErrors(e);
       return;
@@ -101,11 +113,8 @@ export default function UserFormSingle() {
     }
     setGlobalLoading(true);
     try {
-      // Nếu bạn dùng Redux Toolkit createAsyncThunk, unwrap() sẽ giúp bắt lỗi.
-      // Nếu không có unwrap, bạn có thể dùng then/catch hoặc await bình thường.
       await dispatch(createUsersThunk(tempUsers2)).unwrap();
 
-      // Clear temp users sau khi tạo thành công
       dispatch(clearTempUsers());
 
       setAlertMsg("Users created and temp users cleared successfully");

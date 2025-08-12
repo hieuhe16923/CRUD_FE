@@ -2,8 +2,17 @@ import React, { useState } from "react";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
 import Pagination from "../../components/Pagination";
+import Alert from "../../components/Alert";
 
-export default function UsersList() {
+interface UsersListProps {
+  networkError: string | null;
+  clearNetworkError: () => void;
+}
+
+export default function UsersList({
+  networkError,
+  clearNetworkError,
+}: UsersListProps) {
   const { tempUsers } = useAppSelector((s) => s.users);
 
   // Khởi tạo itemsPerPage, mặc định 5
@@ -49,6 +58,15 @@ export default function UsersList() {
   return (
     <div className="card p-3">
       <h5>Preview (temp users)</h5>
+
+      {/* Hiển thị Alert lỗi mạng nếu có */}
+      {networkError && (
+        <Alert
+          type="error"
+          message={networkError}
+          onClose={clearNetworkError}
+        />
+      )}
 
       <div className="mb-3">
         <label htmlFor="itemsPerPage" className="form-label">

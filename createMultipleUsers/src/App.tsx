@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserFormSingle from "./features/users/UserFormSingle";
 import UserFormMultiple from "./features/users/UserFormMultiple";
 import UsersList from "./features/users/UsersList";
+import { setNetworkErrorSetter } from "./services/axiosConfig"; // hàm để set setter cho interceptor
 
 export default function App() {
   const [activeForm, setActiveForm] = useState<"single" | "multiple">("single");
+  const [networkError, setNetworkError] = useState<string | null>(null);
+
+  // Khởi tạo setter cho interceptor
+  useEffect(() => {
+    setNetworkErrorSetter(setNetworkError);
+  }, []);
+
+  // Hàm xóa lỗi mạng khi đóng alert
+  const clearNetworkError = () => setNetworkError(null);
 
   return (
     <div className="container py-4">
@@ -50,7 +60,10 @@ export default function App() {
           {activeForm === "single" ? <UserFormSingle /> : <UserFormMultiple />}
         </div>
         <div>
-          <UsersList />
+          <UsersList
+            networkError={networkError}
+            clearNetworkError={clearNetworkError}
+          />
         </div>
       </div>
     </div>

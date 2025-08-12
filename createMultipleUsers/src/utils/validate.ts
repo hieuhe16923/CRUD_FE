@@ -1,4 +1,3 @@
-// src/utils/validate.ts
 import type { User } from "../features/users/types";
 
 export function validateEmail(email: string): boolean {
@@ -10,7 +9,16 @@ export function validatePhone(phone: string): boolean {
   return /^[0-9+\-\s()]{7,20}$/.test(phone);
 }
 
-export function validateUser(user: Partial<User>): string[] {
+/**
+ * Validate user info, thêm tham số existingEmails để kiểm tra email trùng
+ * @param user Partial<User> user cần kiểm tra
+ * @param existingEmails danh sách email đã có để kiểm tra trùng
+ * @returns mảng lỗi nếu có
+ */
+export function validateUser(
+  user: Partial<User>,
+  existingEmails: string[] = []
+): string[] {
   const errs: string[] = [];
 
   const nameRegex = /^[a-zA-ZÀ-ỹà-ỹ\s]+$/u;
@@ -27,6 +35,8 @@ export function validateUser(user: Partial<User>): string[] {
 
   if (!user.email || !validateEmail(user.email))
     errs.push("Valid email is required");
+  else if (existingEmails.includes(user.email))
+    errs.push("Email must be unique (no duplicates)");
 
   if (!user.password || !passwordRegex.test(user.password))
     errs.push(
