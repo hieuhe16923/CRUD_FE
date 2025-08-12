@@ -20,7 +20,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
         onChange={onChange}
         required={required}
         min={0}
-        className={`border rounded px-3 py-2 w-full ${className}`}
+        className={`w-full px-4 py-3 border border-gray-300 rounded-lg ${className}`}
       />
     </div>
   );

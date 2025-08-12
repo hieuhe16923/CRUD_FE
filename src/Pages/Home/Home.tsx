@@ -42,11 +42,7 @@ const Home = () => {
   }
 
   if (error) {
-    return (
-      <div>
-        <ErrorPage message={error} />
-      </div>
-    );
+    return <ErrorPage message={error} />;
   }
 
   return (

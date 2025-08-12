@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearCart } from '../../redux/slices/petsSlice';
+import { clearCart, updateCartQuantity } from '../../redux/slices/petsSlice';
 import { orderPlace } from '../../redux/api/api'; // cần thêm resetOrder trong slice
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -13,16 +13,16 @@ import 'react-toastify/dist/ReactToastify.css';
 const OrderForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { order, loading } = useSelector((state: RootState) => state.order);
+  const { order, loading, error } = useSelector(
+    (state: RootState) => state.order
+  );
 
-  const [cart, setCart] = useState([]);
-  const [hasSubmitted, setHasSubmitted] = useState(false); // flag kiểm soát toast
+  const { cart } = useSelector((state: RootState) => state.pets);
+
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    setCart(savedCart);
-
-    // reset order để tránh toast khi vào trang
+    // Không cần load từ localStorage nữa
     dispatch(resetOrder());
   }, [dispatch]);
 
@@ -40,26 +40,14 @@ const OrderForm = () => {
     }));
   };
 
-  const handleQuantityChange = (id, value) => {
-    const quantity = Number(value);
-
-    setCart(prev => {
-      let updated;
-      if (quantity <= 0) {
-        // Xóa sản phẩm nếu số lượng <= 0
-        updated = prev.filter(item => item.id !== id);
-      } else {
-        // Cập nhật số lượng nếu > 0
-        updated = prev.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        );
-      }
-      localStorage.setItem('cart', JSON.stringify(updated));
-      return updated;
-    });
+  // CẬP NHẬT handleQuantityChange - sử dụng Redux action
+  const handleQuantityChange = (id, quantity) => {
+    const qty = Number(quantity);
+    dispatch(updateCartQuantity({ id, quantity: qty }));
   };
 
-  const handleSubmit = e => {
+  // handleSubmit KHÔNG CẦN THAY ĐỔI - vẫn dùng cart từ Redux
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!cart.length) {
@@ -67,27 +55,36 @@ const OrderForm = () => {
       return;
     }
 
-    setHasSubmitted(true); // đánh dấu là vừa submit
+    setHasSubmitted(true);
 
-    cart.forEach((item, index) => {
+    for (const item of cart) {
       const orderData = {
         id: form.id,
         petId: item.id,
-        quantity: item.quantity || 1, // lấy từ state cart mới nhất
+        quantity: item.quantity || 1,
         shipDate: new Date().toISOString(),
         status: form.status,
         complete: form.complete,
       };
-      dispatch(orderPlace(orderData));
-    });
+
+      try {
+        await dispatch(orderPlace(orderData)).unwrap();
+      } catch (err: any) {
+        if (!navigator.onLine) {
+          toast.error('Không có kết nối mạng');
+        } else {
+          toast.error(err || 'Đặt hàng thất bại');
+        }
+        return;
+      }
+    }
   };
 
   useEffect(() => {
     if (hasSubmitted && order) {
       toast.success('Đặt hàng thành công!', { autoClose: 2000 });
-      dispatch(clearCart());
-      setCart([]);
-      localStorage.removeItem('cart');
+      dispatch(clearCart()); // Sử dụng Redux action
+      // Không cần setCart([]) và localStorage.removeItem nữa
       setTimeout(() => {
         navigate('/');
       }, 2000);
@@ -140,7 +137,6 @@ const OrderForm = () => {
                           handleQuantityChange(item.id, e.target.value)
                         }
                         type="number"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                       />
                     </div>
                   </div>
@@ -152,7 +148,6 @@ const OrderForm = () => {
                 value={form.id}
                 onChange={handleChange}
                 type="number"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
               />
               <div className="space-y-1">
                 <CustomSelect

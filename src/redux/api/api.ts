@@ -20,9 +20,21 @@ export const orderPlace = createAsyncThunk(
   }
 );
 
-export const fetchPets = createAsyncThunk('pets/fetchPets', async () => {
-  const res = await axios.get(
-    'https://petstore.swagger.io/v2/pet/findByStatus?status=available'
-  );
-  return res.data;
-});
+export const fetchPets = createAsyncThunk(
+  'pets/fetchPets',
+  async (_, thunkAPI) => {
+    try {
+      if (!navigator.onLine) {
+        return thunkAPI.rejectWithValue('Không có kết nối mạng');
+      }
+      const res = await axios.get(
+        'https://petstore.swagger.io/v2/pet/findByStatus?status=available'
+      );
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || err.message || 'Lỗi không xác định'
+      );
+    }
+  }
+);

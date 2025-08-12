@@ -33,6 +33,20 @@ const petSlice = createSlice({
 
       localStorage.setItem('cart', JSON.stringify(state.cart));
     },
+    updateCartQuantity: (state, action) => {
+      const { id, quantity } = action.payload;
+
+      if (quantity <= 0) {
+        state.cart = state.cart.filter(item => item.id !== id);
+      } else {
+        const existingIndex = state.cart.findIndex(item => item.id === id);
+        if (existingIndex !== -1) {
+          state.cart[existingIndex].quantity = quantity;
+        }
+      }
+
+      localStorage.setItem('cart', JSON.stringify(state.cart));
+    },
     clearCart: state => {
       state.cart = [];
       localStorage.removeItem('cart');
@@ -56,10 +70,14 @@ const petSlice = createSlice({
       })
       .addCase(fetchPets.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error =
+          (action.payload as string) ||
+          action.error?.message ||
+          'Lỗi không xác định';
       });
   },
 });
 
-export const { buyPet, clearCart, removeFromCart } = petSlice.actions;
+export const { buyPet, clearCart, removeFromCart, updateCartQuantity } =
+  petSlice.actions;
 export default petSlice.reducer;
