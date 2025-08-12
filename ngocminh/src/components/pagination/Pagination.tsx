@@ -91,11 +91,11 @@ export const Pagination: React.FC<PaginationProps> = ({
                         <li>
                             <button
                                 type="button"
+                                className="page-nav-btn"
                                 onClick={() => handlePageClick(currentPage - 1)}
                                 disabled={currentPage === 1 || loading}
                                 style={{
                                     padding: '8px 12px',
-                                    border: 'none',
                                     background: 'transparent',
                                     color: (currentPage === 1 || loading) ? '#ccc' : '#666',
                                     cursor: (currentPage === 1 || loading) ? 'not-allowed' : 'pointer',
@@ -104,7 +104,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                                     alignItems: 'center',
                                     gap: '4px',
                                     fontSize: '14px',
-                                    fontWeight: '500'
+                                    fontWeight: '500',
+                                    transition: 'background-color 0.2s ease'
                                 }}
                             >
                                 <span style={{ fontSize: '18px' }}>‹</span>
@@ -135,9 +136,9 @@ export const Pagination: React.FC<PaginationProps> = ({
                                         style={{
                                             padding: '8px 12px',
                                             borderRadius: '6px',
-                                            border: '1px solid #e5e5e5', // Viền mỏng hơn
-                                            backgroundColor: currentPage === page ? '#007bff' : 'white', // Background trắng
-                                            color: currentPage === page ? 'white' : '#333',
+                                            border: currentPage === page ? '1px solid #ccc' : '1px solid transparent',
+                                            backgroundColor: 'white', // giống màu nền web
+                                            color: '#000', // chữ luôn đen
                                             fontWeight: currentPage === page ? '600' : '500',
                                             cursor: (currentPage === page || loading) ? 'default' : 'pointer',
                                             opacity: loading ? 0.7 : 1,
@@ -147,8 +148,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                                             minWidth: '36px', // Nhỏ hơn cho mobile
                                             minHeight: '36px',
                                             fontSize: '14px',
-                                            transition: 'all 0.2s ease',
-                                            boxShadow: currentPage === page ? '0 2px 4px rgba(0,123,255,0.2)' : 'none'
+                                            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                                            boxShadow: 'none'
                                         }}
                                     >
                                         {loading && currentPage === page ? (
@@ -156,8 +157,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                                                 style={{
                                                     width: '16px',
                                                     height: '16px',
-                                                    border: '2px solid rgba(255,255,255,0.3)',
-                                                    borderTop: '2px solid white',
+                                                    border: '2px solid rgba(0,0,0,0.3)',
+                                                    borderTop: '2px solid black',
                                                     borderRadius: '50%',
                                                     animation: 'spin 1s linear infinite'
                                                 }}
@@ -174,11 +175,11 @@ export const Pagination: React.FC<PaginationProps> = ({
                         <li>
                             <button
                                 type="button"
+                                className="page-nav-btn"
                                 onClick={() => handlePageClick(currentPage + 1)}
                                 disabled={currentPage === totalPages || loading}
                                 style={{
                                     padding: '8px 12px',
-                                    border: 'none',
                                     background: 'transparent',
                                     color: (currentPage === totalPages || loading) ? '#ccc' : '#666',
                                     cursor: (currentPage === totalPages || loading) ? 'not-allowed' : 'pointer',
@@ -187,7 +188,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                                     alignItems: 'center',
                                     gap: '4px',
                                     fontSize: '14px',
-                                    fontWeight: '500'
+                                    fontWeight: '500',
+                                    transition: 'background-color 0.2s ease'
                                 }}
                             >
                                 <span className="d-none d-sm-inline">Next</span>
@@ -206,6 +208,14 @@ export const Pagination: React.FC<PaginationProps> = ({
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
+                .page-nav-btn {
+  border: 1px solid transparent; /* ban đầu không thấy viền */
+}
+
+.page-nav-btn:not(:disabled):hover {
+  border: 1px solid #007bff; /* xanh Bootstrap */
+  border-radius: 6px;
+}
             `}</style>
         </div>
     );

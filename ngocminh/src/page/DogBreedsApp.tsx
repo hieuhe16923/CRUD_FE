@@ -105,7 +105,7 @@ const DogBreedsApp: React.FC = () => {
     };
 
     return (
-        <div className="bg-light" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <div style={{ flex: '1 0 auto' }}>
             {(loading || paginationLoading) && <LoadingBar />}
 
