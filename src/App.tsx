@@ -1,12 +1,11 @@
 import "./App.css";
-
+import { BrowserRouter } from "react-router-dom";
+import Routers from "./Router/Routers ";
 function App() {
   return (
-    <div>
-      <h1 className="text-center">
-        Welcome to the CRUD Application with FindById functionality!
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Routers />
+    </BrowserRouter>
   );
 }
 
