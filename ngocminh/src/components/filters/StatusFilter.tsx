@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Status, ItemsPerPage } from '../../types';
+import ItemsSelector from "./ItemsSelector.tsx";
 
 interface StatusFilterProps {
     currentStatus: Status;
@@ -84,48 +85,11 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
             </div>
 
             {/* Items per page selector - responsive */}
-            <div
-                className="position-relative"
-                style={{
-                    border: '1px solid #dee2e6',
-                    borderRadius: '6px',
-                    backgroundColor: 'white',
-                    flexShrink: 0
-                }}
-            >
-                <select
-                    className="form-select border-0"
-                    value={itemsPerPage}
-                    onChange={(e) =>
-                        onItemsPerPageChange(Number(e.target.value) as ItemsPerPage)
-                    }
-                    style={{
-                        background: 'transparent',
-                        fontSize: '0.75rem',
-                        minWidth: '50px',
-                        padding: '4px 20px 4px 8px',
-                        appearance: 'none',
-                        outline: 'none'
-                    }}
-                >
-                    {/* Chỉ sử dụng plain text, không có JSX elements */}
-                    <option value={3}>3 mục</option>
-                    <option value={6}>6 mục</option>
-                    <option value={9}>9 mục</option>
-                </select>
-                {/* Custom dropdown arrow */}
-                <div style={{
-                    position: 'absolute',
-                    right: '6px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                    fontSize: '0.6rem',
-                    color: '#6c757d'
-                }}>
-                    ▼
-                </div>
-            </div>
+            <ItemsSelector
+                value={itemsPerPage}
+                onChange={onItemsPerPageChange}
+                disabled={loading}
+            />
         </div>
     );
 };

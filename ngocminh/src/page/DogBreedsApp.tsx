@@ -7,6 +7,7 @@ import { ErrorAlert, OfflineAlert } from '../components/common/Alerts';
 import { PetCard } from '../components/cards/PetCard';
 import { Pagination } from '../components/pagination/Pagination';
 import { Header } from '../components/layout/Header';
+import Footer from "../components/layout/Footer.tsx";
 
 const DogBreedsApp: React.FC = () => {
     const [pets, setPets] = useState<Pet[]>([]);
@@ -16,13 +17,14 @@ const DogBreedsApp: React.FC = () => {
     const [paginationLoading, setPaginationLoading] = useState(false); // Thêm loading riêng cho pagination
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(6);
+    const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(6); // State quản lý items per page thể hiện mặc định có mấy petcard hiển thị
     const isOnline = useOnlineStatus();
 
-    const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentPets = filteredPets.slice(startIndex, endIndex);
+    // Đây là nơi itemsPerPage ảnh hưởng đến hiển thị
+    const totalPages = Math.ceil(filteredPets.length / itemsPerPage); // Tính tổng số trang
+    const startIndex = (currentPage - 1) * itemsPerPage;            // Vị trí bắt đầu
+    const endIndex = startIndex + itemsPerPage;                     // Vị trí kết thúc
+    const currentPets = filteredPets.slice(startIndex, endIndex);   // Cắt mảng pets
 
     const fetchPets = async (status: Status, signal: AbortSignal) => {
         if (!isOnline) {
@@ -95,8 +97,8 @@ const DogBreedsApp: React.FC = () => {
     };
 
     const handleItemsPerPageChange = (items: ItemsPerPage) => {
-        setItemsPerPage(items);
-        setCurrentPage(1);
+        setItemsPerPage(items); // Cập nhật state
+        setCurrentPage(1); // Reset về trang 1
     };
 
     const handleRetry = () => {
@@ -186,36 +188,7 @@ const DogBreedsApp: React.FC = () => {
             </div>
             </div>
             {/* Footer - Dùng Bootstrap classes */}
-            <footer className="bg-white border-top mt-5" style={{ flexShrink: 0 }}>
-                <div className="container" style={{ maxWidth: '1200px' }}>
-                    <div className="py-4">
-                        <div className="d-flex justify-content-between align-items-center flex-wrap">
-                            <div className="d-flex gap-4">
-                                <a href="#" className="text-muted text-decoration-none small">
-                                    Tài nguyên
-                                </a>
-                                <a href="#" className="text-muted text-decoration-none small">
-                                    Công ty
-                                </a>
-                            </div>
-                            <div className="d-flex gap-3 align-items-center">
-                                <a href="#" className="text-muted text-decoration-none fs-5">
-                                    📘
-                                </a>
-                                <a href="#" className="text-muted text-decoration-none fs-5">
-                                    🐦
-                                </a>
-                                <a href="#" className="text-muted text-decoration-none fs-5">
-                                    💼
-                                </a>
-                            </div>
-                        </div>
-                        <div className="mt-3 d-flex align-items-center gap-2">
-                            <small className="text-muted">Made with 💙 Visily</small>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };
