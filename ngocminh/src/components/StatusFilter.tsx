@@ -1,30 +1,22 @@
 import React from 'react';
-import type { Status, ItemsPerPage } from '../../types';
+import type {PetStatus, StatusFilterPropsDto} from '../types';
 import ItemsSelector from "./ItemsSelector.tsx";
 
-interface StatusFilterProps {
-    currentStatus: Status;
-    onStatusChange: (status: Status) => void;
-    loading: boolean;
-    itemsPerPage: ItemsPerPage;
-    onItemsPerPageChange: (value: ItemsPerPage) => void;
-    totalItems: number;
-}
 
-export const StatusFilter: React.FC<StatusFilterProps> = ({
+export const StatusFilter: React.FC<StatusFilterPropsDto> = ({
                                                               currentStatus,
                                                               onStatusChange,
                                                               loading,
                                                               itemsPerPage,
                                                               onItemsPerPageChange,
                                                           }) => {
-    const statusLabels: Record<Status, string> = {
+    const statusLabels: Record<PetStatus, string> = {
         available: 'Có sẵn',
         pending: 'Đang chờ',
         sold: 'Đã bán'
     };
 
-    const statusButtonClass: Record<Status, string> = {
+    const statusButtonClass: Record<PetStatus, string> = {
         available: 'btn-success',
         pending: 'btn-warning',
         sold: 'btn-danger'
@@ -51,7 +43,7 @@ export const StatusFilter: React.FC<StatusFilterProps> = ({
                 border: '1px solid #dee2e6',
                 flexShrink: 0
             }}>
-                {(Object.keys(statusLabels) as Status[]).map((status) => (
+                {(Object.keys(statusLabels) as PetStatus[]).map((status) => (
                     <button
                         key={status}
                         type="button"

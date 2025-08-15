@@ -1,17 +1,21 @@
+// components/filters/ItemsSelector.tsx
 import React from 'react';
-import type { ItemsPerPage } from '../../types';
+import type { ItemsPerPage } from '../types';
 
-interface ItemsSelectorProps {
-    value: ItemsPerPage;
-    onChange: (value: ItemsPerPage) => void;
-    disabled?: boolean;
-}
+/**
+ * Items Selector Props DTO - Type cho props của component
+ */
+type ItemsSelectorPropsDto = {
+    readonly value: ItemsPerPage;
+    readonly onChange: (value: ItemsPerPage) => void;
+    readonly disabled?: boolean;
+};
 
-const ItemsSelector: React.FC<ItemsSelectorProps> = ({
-                                                         value,
-                                                         onChange,
-                                                         disabled = false
-                                                     }) => {
+const ItemsSelector: React.FC<ItemsSelectorPropsDto> = ({
+                                                            value,
+                                                            onChange,
+                                                            disabled = false
+                                                        }) => {
     return (
         <div
             className="position-relative"
@@ -43,7 +47,7 @@ const ItemsSelector: React.FC<ItemsSelectorProps> = ({
                 <option value={3}>3 mục</option>
                 <option value={6}>6 mục</option>
                 <option value={9}>9 mục</option>
-                {/*<option value={20}>20 mục</option>*/}
+                <option value={20}>20 mục</option>
             </select>
 
             {/* Custom dropdown arrow */}

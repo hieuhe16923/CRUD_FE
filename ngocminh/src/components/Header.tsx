@@ -1,19 +1,10 @@
 import React from 'react';
 import { Wifi, WifiOff } from 'lucide-react';
-import type {ItemsPerPage, Status} from '../../types';
-import { StatusFilter } from '../filters/StatusFilter';
+import type { Status} from '../types';
+import { StatusFilter } from './StatusFilter.tsx';
+import type { HeaderPropsDto } from '../types';
 
-interface HeaderProps {
-    isOnline: boolean;
-    currentStatus: Status;
-    onStatusChange: (status: Status) => void;
-    loading: boolean;
-    itemsPerPage: ItemsPerPage;
-    onItemsPerPageChange: (items: ItemsPerPage) => void;
-    totalItems: number;
-}
-
-export const Header: React.FC<HeaderProps> = ({
+export const Header: React.FC<HeaderPropsDto> = ({
                                                   isOnline,
                                                   currentStatus,
                                                   onStatusChange,

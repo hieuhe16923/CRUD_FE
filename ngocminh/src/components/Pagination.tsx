@@ -1,14 +1,10 @@
 // components/pagination/Pagination.tsx
 import React from 'react';
 
-interface PaginationProps {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-    loading?: boolean; // Thêm loading prop
-}
+import type {PaginationPropsDto } from '../types';
 
-export const Pagination: React.FC<PaginationProps> = ({
+
+export const Pagination: React.FC<PaginationPropsDto> = ({
                                                           currentPage,
                                                           totalPages,
                                                           onPageChange,

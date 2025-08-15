@@ -1,11 +1,8 @@
 import React from 'react';
-import type { Pet, Status } from '../../types';
+import type { PetCardPropsDto, PetStatus } from '../types';
 
-interface PetCardProps {
-    pet: Pet;
-}
 
-export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
+export const PetCard: React.FC<PetCardPropsDto> = ({ pet }) => {
     const getCategoryImage = (categoryName?: string): string => {
         const defaultImage = "https://m.media-amazon.com/images/I/61E7E12FtBL._UF894,1000_QL80_.jpg";
 
@@ -22,20 +19,20 @@ export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
         return defaultImage;
     };
 
-    const statusColors: Record<Status, string> = {
+    const statusColors: Record<PetStatus, string> = {
         available: 'success',
         pending: 'warning',
         sold: 'danger'
     };
 
-    const statusLabels: Record<Status, string> = {
+    const statusLabels: Record<PetStatus, string> = {
         available: 'Có sẵn',
         pending: 'Đang chờ',
         sold: 'Đã bán'
     };
 
     // Xử lý status mặc định nếu thiếu
-    const displayStatus: Status = pet.status || 'sold';
+    const displayStatus: PetStatus = pet.status || 'sold';
 
     return (
         <div className="card h-100 shadow-sm" style={{ transition: 'transform 0.2s' }}
