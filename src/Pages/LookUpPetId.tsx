@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
@@ -11,21 +11,23 @@ function App() {
   const [petId, setPetId] = useState("");
   const [loading, setLoading] = useState(false);
   const [pet, setPet] = useState<Pet | null>(null);
+  const [searched, setSearched] = useState(false);
 
   const handleSearch = async () => {
-    // TODO: Thêm logic tìm kiếm Pet theo petId ở đây
     setLoading(true);
+    setPetId(petId);
+    setSearched(true);
     try {
       const petData = await getPetById(petId);
       setPet(petData);
-      // TODO: Xử lý dữ liệu trả về ở đây
     } catch (error) {
       console.error("Error fetching pet:", error);
-      // TODO: Xử lý lỗi ở đây
+      setPet(null);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className=" flex flex-col bg-[#fafafb] pt-8 px-8">
       {/* Heading */}
@@ -85,9 +87,15 @@ function App() {
             <h3 className="text-lg font-semibold text-[24px] text-[#171A1FFF]">
               Search for a Pet
             </h3>
-            <p className="text-[#565D6DFF] text-[16px] font-normal text-center">
-              Enter a pet ID above to view detailed information.
-            </p>
+            {searched && !loading && !pet ? (
+              <p className="text-[#565D6DFF] text-[16px] font-normal text-center">
+                No pet found with the provided ID
+              </p>
+            ) : (
+              <p className="text-[#565D6DFF] text-[16px] font-normal text-center">
+                Enter a pet ID above to view detailed information.
+              </p>
+            )}
           </>
         )}
       </div>

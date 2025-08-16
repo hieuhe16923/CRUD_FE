@@ -7,90 +7,90 @@ interface PetCardProps {
 }
 const PetInfo: React.FC<PetCardProps> = ({ petData }) => {
   if (!petData) {
-    return <div>Không có dữ liệu pet.</div>;
+    return null;
   }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      {/* Main info section */}
+      {/* Header section with name and status */}
+      <div className="flex justify-between items-start mb-4">
+        <h2 className="text-2xl font-bold text-gray-800">{petData.name}</h2>
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-medium ${
+            petData.status === "available"
+              ? "bg-green-100 text-green-800"
+              : petData.status === "pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {petData.status.toUpperCase()}
+        </span>
+      </div>
+
+      {/* ID - less prominent */}
+      <p className="text-gray-500 text-sm mb-6">ID: {petData.id}</p>
+
+      {/* Main content */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Pet image */}
+        {/* Pet image - larger and centered */}
         <div className="md:col-span-1">
-          {petData.photoUrls.length > 0 ? (
-            <img
-              src={petData.photoUrls[0]}
-              alt={petData.name}
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          ) : (
-            <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-              <figure>
-                <img
-                  src={defaultImgPet}
-                  className="w-full h-full object-cover"
-                  alt={petData.name}
-                />
-              </figure>
-            </div>
-          )}
+          <div className="rounded-lg overflow-hidden bg-gray-100">
+            <figure className="max-w-xs">
+              <img
+                src={
+                  petData.photoUrls.length > 0 &&
+                  petData.photoUrls[0] !== "string"
+                    ? petData.photoUrls[0]
+                    : defaultImgPet
+                }
+                alt={petData.name}
+                className="w-full h-full object-cover"
+              />
+            </figure>
+          </div>
         </div>
 
-        {/* Pet details */}
-        <div className="md:col-span-2">
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold">{petData.name}</h2>
-              <p className="text-gray-600">ID: {petData.id}</p>
-            </div>
+        {/* Details section */}
+        <div className="md:col-span-2 space-y-4">
+          {/* Category */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-500 mb-1">Category</h3>
+            <p className="text-lg">{petData.category?.name || "Unknown"}</p>
+          </div>
 
-            <div className="flex items-center space-x-2">
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  petData.status === "available"
-                    ? "bg-green-100 text-green-800"
-                    : petData.status === "pending"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {petData.status}
-              </span>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700">Category</h3>
-              <p>{petData.category?.name}</p>
+          {/* Tags */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-medium text-gray-500 mb-2">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {petData.tags.length > 0 ? (
+                petData.tags.map((tag) => (
+                  <Tag key={tag.id} id={tag.id} name={tag.name} />
+                ))
+              ) : (
+                <p className="text-gray-400">No tags available</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tags section */}
-      <div className="mb-6">
-        <h3 className="font-medium text-gray-700 mb-2">Tags</h3>
-        <div className="flex flex-wrap gap-2">
-          {petData.tags.length > 0 ? (
-            petData.tags.map((tag) => (
-              <Tag key={tag.id} id={tag.id} name={tag.name} />
-            ))
-          ) : (
-            <p className="text-gray-500">No tags</p>
-          )}
-        </div>
-      </div>
-
-      {/* Additional photos */}
+      {/* Additional photos only if exist */}
       {petData.photoUrls.length > 1 && (
-        <div>
-          <h3 className="font-medium text-gray-700 mb-3">Additional Photos</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="mt-6">
+          <h3 className="font-medium text-gray-700 mb-3">Gallery</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {petData.photoUrls.slice(1).map((url, index) => (
-              <img
+              <div
                 key={index}
-                src={url}
-                alt={`${petData.name} ${index + 2}`}
-                className="w-full h-32 object-cover rounded-lg"
-              />
+                className="aspect-square overflow-hidden rounded-lg bg-gray-100"
+              >
+                <img
+                  src={url}
+                  alt={`${petData.name} photo ${index + 2}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             ))}
           </div>
         </div>

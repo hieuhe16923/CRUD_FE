@@ -22,7 +22,7 @@ const navItems: NavItem[] = [
 ];
 
 const Sidebar = () => {
-  const [activeMenu, setActiveMenu] = useState<string>("Dashboard");
+  const [activeMenu, setActiveMenu] = useState<string>("Pet Lookup");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -34,7 +34,7 @@ const Sidebar = () => {
       {/* Mobile Hamburger Button */}
       <button
         onClick={toggleSidebar}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
+        className="md:hidden cursor-pointer fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md"
       >
         {isMobileSidebarOpen ? <CloseIcon /> : <MenuIcon />}
       </button>
@@ -42,14 +42,14 @@ const Sidebar = () => {
       {/* Overlay for mobile */}
       {isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black opacity-50 z-40 md:hidden"
           onClick={toggleSidebar}
         ></div>
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed md:static z-50 w-64 bg-white shadow-lg flex flex-col h-screen transition-all duration-300 ease-in-out ${
+        className={`fixed md:static z-50 w-64 bg-white shadow-lg flex flex-col h-screen transition-all duration-200 ease-linear ${
           isMobileSidebarOpen ? "left-0" : "-left-64 md:left-0"
         }`}
       >
@@ -60,7 +60,7 @@ const Sidebar = () => {
           </figure>
           <button
             onClick={toggleSidebar}
-            className="md:hidden p-1 rounded-full hover:bg-gray-100"
+            className="md:hidden p-1 cursor-pointer rounded-full hover:bg-gray-100"
           >
             <CloseIcon />
           </button>
