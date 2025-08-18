@@ -1,28 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearCart, updateCartQuantity } from '../../redux/slices/petsSlice';
-import { orderPlace } from '../../redux/api/api'; // cần thêm resetOrder trong slice
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import CustomSelect from '../../Components/SelectOption';
-import CustomInput from '../../Components/FormInput';
+import OptionSelect from '../../Components/SelectOption';
+import FormInput from '../../Components/FormInput';
 import FormButton from '../../Components/FormButton';
-import { resetOrder } from '../../redux/slices/ordersSlice';
+import { placeMultipleOrders } from '../../services/order.service';
+import { RootState, AppDispatch } from '../../redux/store';
+import {
+  resetOrder,
+  clearCart,
+  updateCartQuantity,
+  removeFromCart,
+} from '../../redux/slices/ordersSlice';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 const OrderForm = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { order, loading, error } = useSelector(
+  const { order, loading, error, cart } = useSelector(
     (state: RootState) => state.order
   );
-
-  const { cart } = useSelector((state: RootState) => state.pets);
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
-    // Không cần load từ localStorage nữa
     dispatch(resetOrder());
   }, [dispatch]);
 
@@ -32,7 +35,9 @@ const OrderForm = () => {
     complete: false,
   });
 
-  const handleChange = e => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({
       ...prev,
@@ -40,56 +45,41 @@ const OrderForm = () => {
     }));
   };
 
-  // CẬP NHẬT handleQuantityChange - sử dụng Redux action
-  const handleQuantityChange = (id, quantity) => {
-    const qty = Number(quantity);
-    dispatch(updateCartQuantity({ id, quantity: qty }));
+  const handleQuantityChange = (id: number, quantity: number) => {
+    dispatch(updateCartQuantity({ id, quantity: Number(quantity) }));
   };
 
-  // handleSubmit KHÔNG CẦN THAY ĐỔI - vẫn dùng cart từ Redux
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!cart.length) {
+    if (!cart || cart.length === 0) {
       toast.error('Giỏ hàng trống!');
       return;
     }
 
     setHasSubmitted(true);
 
-    for (const item of cart) {
-      const orderData = {
-        id: form.id,
-        petId: item.id,
-        quantity: item.quantity || 1,
-        shipDate: new Date().toISOString(),
-        status: form.status,
-        complete: form.complete,
-      };
+    try {
+      // 👉 gọi API cho từng pet trong giỏ
+      await placeMultipleOrders(dispatch, form, cart);
 
-      try {
-        await dispatch(orderPlace(orderData)).unwrap();
-      } catch (err: any) {
-        if (!navigator.onLine) {
-          toast.error('Không có kết nối mạng');
-        } else {
-          toast.error(err || 'Đặt hàng thất bại');
-        }
-        return;
-      }
+      dispatch(clearCart());
+      setTimeout(() => navigate('/'), 2000);
+    } catch (err) {
+      toast.error('Có lỗi xảy ra khi đặt hàng');
     }
   };
 
   useEffect(() => {
     if (hasSubmitted && order) {
       toast.success('Đặt hàng thành công!', { autoClose: 2000 });
-      dispatch(clearCart()); // Sử dụng Redux action
-      // Không cần setCart([]) và localStorage.removeItem nữa
+      dispatch(clearCart());
       setTimeout(() => {
         navigate('/');
       }, 2000);
+    } else if (hasSubmitted && error) {
+      toast.error(error);
     }
-  }, [order, hasSubmitted, dispatch, navigate]);
+  }, [order, error, hasSubmitted, dispatch, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -129,40 +119,46 @@ const OrderForm = () => {
                       Pet ID: {item.id}
                     </span>
                     <div className="space-y-1">
-                      <CustomInput
+                      <FormInput
                         label="Quantity"
                         name="quantity"
                         value={item.quantity}
                         onChange={e =>
-                          handleQuantityChange(item.id, e.target.value)
+                          handleQuantityChange(item.id, Number(e.target.value))
                         }
                         type="number"
                       />
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => dispatch(removeFromCart(item.id))}
+                      className="ml-4 text-red-500 hover:text-red-700 font-semibold"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>
-              <CustomInput
+
+              <FormInput
                 label="Id"
                 name="id"
                 value={form.id}
                 onChange={handleChange}
                 type="number"
               />
-              <div className="space-y-1">
-                <CustomSelect
-                  label="Order Status"
-                  name="status"
-                  value={form.status}
-                  onChange={handleChange}
-                  options={[
-                    { value: 'placed', label: 'Placed' },
-                    { value: 'approved', label: 'Approved' },
-                    { value: 'delivered', label: 'Delivered' },
-                  ]}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                />
-              </div>
+
+              <OptionSelect
+                label="Order Status"
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                options={[
+                  { value: 'placed', label: 'Placed' },
+                  { value: 'approved', label: 'Approved' },
+                  { value: 'delivered', label: 'Delivered' },
+                ]}
+              />
 
               <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
                 <input
@@ -197,7 +193,7 @@ const OrderForm = () => {
               >
                 <path
                   fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2-2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                   clipRule="evenodd"
                 />
               </svg>

@@ -1,7 +1,17 @@
 import React from 'react';
-import { CustomInputProps } from '../Types/InputTypes';
 
-const CustomInput: React.FC<CustomInputProps> = ({
+interface CustomInputProps {
+  label?: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  type?: string;
+  className?: string;
+  required?: boolean;
+}
+
+const FormInput: React.FC<CustomInputProps> = ({
   label,
   name,
   value,
@@ -26,4 +36,4 @@ const CustomInput: React.FC<CustomInputProps> = ({
   );
 };
 
-export default CustomInput;
+export default FormInput;

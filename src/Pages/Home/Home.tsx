@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPets } from '../../redux/api/api';
-import { buyPet } from '../../redux/slices/petsSlice';
+import { buyPet, fetchPets } from '../../redux/slices/petsSlice';
+import { addToCart } from '../../redux/slices/ordersSlice';
 import PaginationComponent from './../../Components/Pagination';
 import BreedItem from './../../Components/Breeds/BreedItem';
 import Loading from '../../Components/Loading';
@@ -9,17 +9,17 @@ import ErrorPage from '../../Components/Errors';
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { list, loading, error } = useSelector(state => state.pets);
+  const { list, loading, error } = useSelector((state: any) => state.pets);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 9;
 
-  const handlePageChange = newPage => {
+  const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
-    dispatch(fetchPets());
+    dispatch(fetchPets() as any); // ✅ dùng thunk, không gọi PetService trực tiếp
   }, [dispatch]);
 
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -33,17 +33,8 @@ const Home = () => {
     },
   };
 
-  if (loading) {
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <ErrorPage message={error} />;
-  }
+  if (loading) return <Loading />;
+  if (error) return <ErrorPage message={error} />;
 
   return (
     <div className="max-w-5xl mx-auto p-4">
@@ -62,7 +53,10 @@ const Home = () => {
                   life={pet.life || null}
                   male_weight={pet.male_weight || null}
                   female_weight={pet.female_weight || null}
-                  onBuy={() => dispatch(buyPet(pet))}
+                  onBuy={() => {
+                    dispatch(buyPet(pet));
+                    dispatch(addToCart(pet));
+                  }}
                 />
               </div>
             ))}

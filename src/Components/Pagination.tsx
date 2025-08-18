@@ -1,5 +1,17 @@
 import React from 'react';
-import { PaginationProps } from '../Types/Pagination';
+
+interface PaginationProps {
+  meta: {
+    pagination: {
+      current: number;
+      next?: number;
+      last: number;
+      records: number;
+    };
+  };
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+}
 
 const PaginationComponent: React.FC<PaginationProps> = ({
   meta,

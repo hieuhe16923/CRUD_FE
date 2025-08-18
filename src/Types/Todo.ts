@@ -1,5 +1,6 @@
 export type Todo = {
   id: number;
-  text: string;
+  petId: number;
+  quantity: number;
   isEditing: boolean;
 };

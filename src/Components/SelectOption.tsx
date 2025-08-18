@@ -1,7 +1,20 @@
 import React from 'react';
-import { CustomSelectProps } from '../Types/SelectType';
 
-const CustomSelect: React.FC<CustomSelectProps> = ({
+interface Option {
+  value: string | number;
+  label: string;
+}
+
+interface CustomSelectProps {
+  label?: string;
+  name: string;
+  value: string | number;
+  options: Option[];
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  className?: string;
+}
+
+const OptionSelect: React.FC<CustomSelectProps> = ({
   label,
   name,
   value,
@@ -21,7 +34,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         name={name}
         value={value}
         onChange={onChange}
-        className={`border rounded p-2 outline-none ${className}`}
+        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${className}`}
       >
         {options.map(option => (
           <option key={option.value} value={option.value}>
@@ -33,4 +46,4 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   );
 };
 
-export default CustomSelect;
+export default OptionSelect;

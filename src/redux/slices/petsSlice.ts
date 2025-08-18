@@ -1,60 +1,37 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { fetchPets } from '../api/api';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { Pet } from '../../dto/pets.dto';
+import { PetService } from '../../services/pet.service';
 
-const getCartFromLocalStorage = () => {
-  try {
-    const cart = localStorage.getItem('cart');
-    return cart ? JSON.parse(cart) : [];
-  } catch {
-    return [];
+interface PetsState {
+  list: Pet[];
+  loading: boolean;
+  error: string | null;
+}
+
+// ✅ tạo thunk để wrap PetService
+export const fetchPets = createAsyncThunk<Pet[], void, { rejectValue: string }>(
+  'pets/fetchPets',
+  async (_, thunkAPI) => {
+    try {
+      return await PetService.fetchPets();
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err.message || 'Lỗi không xác định');
+    }
   }
-};
+);
 
 const petSlice = createSlice({
   name: 'pets',
   initialState: {
-    list: [],
+    list: [] as Pet[],
     loading: false,
     error: null,
-    cart: getCartFromLocalStorage(),
-  },
+  } as PetsState,
   reducers: {
     buyPet: (state, action) => {
+      // chỉ giữ lại logic chọn pet thôi
       const pet = action.payload;
-      const existingIndex = state.cart.findIndex(item => item.id === pet.id);
-
-      if (existingIndex !== -1) {
-        // Nếu đã có, tăng số lượng
-        state.cart[existingIndex].quantity += 1;
-      } else {
-        // Nếu chưa có, thêm mới với quantity = 1
-        state.cart.push({ ...pet, quantity: 1 });
-      }
-
-      localStorage.setItem('cart', JSON.stringify(state.cart));
-    },
-    updateCartQuantity: (state, action) => {
-      const { id, quantity } = action.payload;
-
-      if (quantity <= 0) {
-        state.cart = state.cart.filter(item => item.id !== id);
-      } else {
-        const existingIndex = state.cart.findIndex(item => item.id === id);
-        if (existingIndex !== -1) {
-          state.cart[existingIndex].quantity = quantity;
-        }
-      }
-
-      localStorage.setItem('cart', JSON.stringify(state.cart));
-    },
-    clearCart: state => {
-      state.cart = [];
-      localStorage.removeItem('cart');
-    },
-    removeFromCart: (state, action) => {
-      const petId = action.payload;
-      state.cart = state.cart.filter(pet => pet.id !== petId);
-      localStorage.setItem('cart', JSON.stringify(state.cart));
+      // dispatch sang orderSlice để thêm cart
     },
   },
   extraReducers: builder => {
@@ -71,13 +48,10 @@ const petSlice = createSlice({
       .addCase(fetchPets.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          (action.payload as string) ||
-          action.error?.message ||
-          'Lỗi không xác định';
+          action.payload || action.error.message || 'Lỗi không xác định';
       });
   },
 });
 
-export const { buyPet, clearCart, removeFromCart, updateCartQuantity } =
-  petSlice.actions;
+export const { buyPet } = petSlice.actions;
 export default petSlice.reducer;
