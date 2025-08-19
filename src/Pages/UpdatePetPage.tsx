@@ -1,26 +1,28 @@
+/* eslint-disable no-irregular-whitespace */
 // pages/UpdatePetPage.tsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import PetForm from '../Components/PetForm';
 import { Pet } from '../types';
 import { petService } from '../services/petService';
-import Toast from '../Components/Toast'; // Import Toast component
+import Toast from '../Components/Toast';
 
 const UpdatePetPage: React.FC = () => {
-  const { petId } = useParams<{ petId: string }>(); // Lấy petId từ tham số URL
-  const [petToUpdate, setPetToUpdate] = useState<Pet | undefined>(undefined);
+  const { petId } = useParams<{ petId: string }>();
+  const navigate = useNavigate();
+  const [petToUpdate, setPetToUpdate] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  const navigate = useNavigate(); // Initialize useNavigate hook
 
   useEffect(() => {
     const fetchPetData = async () => {
-      if (!petId) {
-        setError('Không có ID thú cưng để cập nhật.');
+      if (!petId || isNaN(Number(petId))) {
+        // Handle invalid ID in URL
+        setError('ID thú cưng không hợp lệ. Vui lòng kiểm tra lại URL.');
         setIsLoading(false);
         return;
       }
@@ -28,42 +30,31 @@ const UpdatePetPage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const idAsNumber = parseInt(petId, 10);
-        if (isNaN(idAsNumber)) {
-          throw new Error('ID thú cưng không hợp lệ.');
-        }
-        const data = await petService.getPetById(idAsNumber);
+        const data = await petService.getPetById(Number(petId));
         setPetToUpdate(data);
       } catch (err: any) {
         console.error('Failed to fetch pet data:', err);
-        setError(
-          `Không thể tải dữ liệu thú cưng: ${
-            err.message || 'Lỗi không xác định'
-          }`
-        );
-        setToast({
-          message: `Error loading pet data: ${
-            err.message || 'Please try again.'
-          }`,
-          type: 'error',
-        });
+        setError(`Không thể tải dữ liệu thú cưng. Vui lòng kiểm tra ID.`);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPetData();
-  }, [petId]); // Sẽ fetch lại dữ liệu nếu petId từ URL thay đổi
+  }, [petId]);
 
   const handleSuccess = () => {
-    console.log('Pet updated successfully! Navigating to pet list.');
-    setToast({ message: 'Pet updated successfully!', type: 'success' }); // Ensure toast message is shown
-    // Navigate to the pet list page after a short delay for the toast to be seen
+    // Show success toast and navigate back
+    setToast({
+      message: 'Đã cập nhật thông tin thú cưng thành công!',
+      type: 'success',
+    });
     setTimeout(() => {
-      navigate('/pets'); // Navigate to the pet list page
-    }, 1500); // Delay for 1.5 seconds to allow user to see the toast
+      navigate('/pets');
+    }, 1500); // Allow user to see the success message
   };
 
+  // Render states
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50 text-gray-700">
@@ -94,15 +85,14 @@ const UpdatePetPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 text-red-600">
-        <p>{error}</p>
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-red-600">
+        <p className="text-lg font-semibold">{error}</p>
+        <button
+          onClick={() => navigate('/pets')}
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-150"
+        >
+                    Quay lại danh sách thú cưng
+        </button>
       </div>
     );
   }
@@ -116,8 +106,10 @@ const UpdatePetPage: React.FC = () => {
           onSuccess={handleSuccess}
         />
       ) : (
+        // This block handles cases where petToUpdate is null after loading (e.g., fetch failed)
+        // It's a fallback for the error state above, providing a clearer message.
         <div className="text-gray-700">
-          Không tìm thấy thú cưng để cập nhật hoặc ID không hợp lệ.
+          Không tìm thấy thú cưng để cập nhật.
         </div>
       )}
       {toast && (

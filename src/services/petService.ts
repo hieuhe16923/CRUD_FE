@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 // services/petService.ts
-import { Pet } from '../types'; // Import Pet interface from types.ts
+import { Pet, Category, Tag } from '../types';
 
 const BASE_URL = 'https://petstore.swagger.io/v2/pet';
 
@@ -7,7 +8,6 @@ const BASE_URL = 'https://petstore.swagger.io/v2/pet';
 async function fetchWithRetry<T>(
   url: string,
   options: RequestInit,
-  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   maxRetries: number = 5
 ): Promise<T> {
   let currentRetry = 0;
@@ -27,14 +27,14 @@ async function fetchWithRetry<T>(
       console.error(`Attempt ${currentRetry + 1} failed:`, error);
       currentRetry++;
       if (currentRetry < maxRetries) {
-        const delay = Math.pow(2, currentRetry) * 1000; // Exponential delay
+        const delay = Math.pow(2, currentRetry) * 1000;
         await new Promise(res => setTimeout(res, delay));
       } else {
-        throw error; // Re-throw error if max retries reached
+        throw error;
       }
     }
   }
-  throw new Error('Max retries exceeded.'); // Should not be reached
+  throw new Error('Max retries exceeded.');
 }
 
 export const petService = {
@@ -113,5 +113,49 @@ export const petService = {
         'Content-Type': 'application/json',
       },
     });
+  },
+
+  /**
+   * Finds pets by tags.
+   * @returns A list of Tag objects.
+   */
+  getTags: async (): Promise<Tag[]> => {
+    try {
+      const availablePets = await petService.findPetsByStatus('available');
+      const allTags: Tag[] = [];
+      const uniqueTagIds = new Set<number>();
+
+      availablePets.forEach(pet => {
+        if (pet.tags) {
+          pet.tags.forEach(tag => {
+            if (tag.id && !uniqueTagIds.has(tag.id)) {
+              allTags.push(tag);
+              uniqueTagIds.add(tag.id);
+            }
+          });
+        }
+      });
+      return allTags;
+    } catch (error) {
+      console.error('Failed to fetch unique tags from available pets:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Gets a list of categories
+   * @returns A list of Category objects.
+   */
+  getCategories: async (): Promise<Category[]> => {
+    // sử dụng categories cố định.
+    console.log('Fetching hard-coded categories.');
+    const categories: Category[] = [
+      { id: 1, name: 'Dogs' },
+      { id: 2, name: 'Cats' },
+      { id: 3, name: 'Reptiles' },
+      { id: 4, name: 'Birds' },
+      { id: 5, name: 'Fish' },
+    ];
+    return categories;
   },
 };

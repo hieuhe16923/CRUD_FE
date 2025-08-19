@@ -1,7 +1,8 @@
+// components/PetForm.tsx
+/* eslint-disable no-irregular-whitespace */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable no-use-before-define */
-// components/PetForm.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import InputGroup from './InputGroup';
 import SelectGroup from './SelectGroup';
@@ -27,49 +28,77 @@ const PetForm: React.FC<PetFormProps> = ({
     petName: initialPetData?.name || '',
     categoryId: initialPetData?.category?.id || '',
     categoryName: initialPetData?.category?.name || '',
-    photoUrls: initialPetData?.photoUrls.join(', ') || '',
+    photoUrls: initialPetData?.photoUrls?.join(', ') || '',
     tags: initialPetData?.tags?.map(tag => tag.name).join(', ') || '',
     status: initialPetData?.status || 'available',
   });
 
   const [errors, setErrors] = useState<Partial<PetFormValues>>({});
+  const [idError, setIdError] = useState<string | null>(null); // 💡 State mới để quản lý lỗi ID
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
 
+  const [categories, setCategories] = useState<SelectOption[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoadingCategories(true);
+      try {
+        const fetchedCategories = await petService.getCategories();
+        const categoryOptions = fetchedCategories.map(cat => ({
+          value: String(cat.id),
+          label: cat.name,
+          apiName: cat.name,
+        }));
+        setCategories(categoryOptions);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        setToast({
+          message: 'Failed to load categories. Please try again.',
+          type: 'error',
+        });
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     if (formType === 'update' && initialPetData) {
-      // Find the category option that matches the initial pet data's category ID
-      const matchedCategory = categoryOptions.find(
-        opt => opt.value === initialPetData.category?.id
+      const matchedCategory = categories.find(
+        opt => Number(opt.value) === initialPetData.category?.id
       );
       setFormData({
         id: initialPetData.id || '',
         petName: initialPetData.name || '',
-        categoryId: matchedCategory ? Number(matchedCategory.value) : '', // Use matched ID or empty
+        categoryId: matchedCategory ? Number(matchedCategory.value) : '',
         categoryName: matchedCategory
           ? matchedCategory.label
-          : initialPetData.category?.name || '', // Use matched label or API name
-        photoUrls: initialPetData.photoUrls.join(', ') || '',
+          : initialPetData.category?.name || '',
+        photoUrls: initialPetData.photoUrls?.join(', ') || '',
         tags: initialPetData.tags?.map(tag => tag.name).join(', ') || '',
         status: initialPetData.status || 'available',
       });
       setErrors({});
     }
-  }, [formType, initialPetData]);
+  }, [formType, initialPetData, categories]);
 
   const validate = useCallback(() => {
     const newErrors: Partial<PetFormValues> = {};
     if (!formData.petName.trim()) {
-      newErrors.petName = 'Pet name cannot be empty.'; // Updated error message
+      newErrors.petName = 'Pet name cannot be empty.';
     }
     if (!formData.categoryId && !formData.categoryName.trim()) {
-      newErrors.categoryName = 'Please select or enter a category name.'; // Updated error message
+      newErrors.categoryName = 'Please select or enter a category name.';
     }
     if (!formData.photoUrls.trim()) {
-      newErrors.photoUrls = 'Please provide at least one photo URL.'; // Updated error message
+      newErrors.photoUrls = 'Please provide at least one photo URL.';
     } else {
       const urls = formData.photoUrls
         .split(',')
@@ -77,7 +106,7 @@ const PetForm: React.FC<PetFormProps> = ({
         .filter(Boolean);
       const urlRegex = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
       if (urls.some(url => !urlRegex.test(url))) {
-        newErrors.photoUrls = 'Some photo URLs are invalid.'; // Updated error message
+        newErrors.photoUrls = 'Some photo URLs are invalid.';
       }
     }
     setErrors(newErrors);
@@ -96,6 +125,9 @@ const PetForm: React.FC<PetFormProps> = ({
     }));
     if (errors[name as keyof PetFormValues]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+    if (name === 'id') {
+      setIdError(null); // 💡 Xóa lỗi ID khi người dùng thay đổi giá trị
     }
   };
 
@@ -126,10 +158,16 @@ const PetForm: React.FC<PetFormProps> = ({
       status: formData.status,
     };
 
+    if (formType === 'add') {
+      petObject.id = Math.floor(Math.random() * 1000000000);
+    } else if (formType === 'update' && initialPetData?.id) {
+      petObject.id = initialPetData.id;
+    }
+
     let categoryNameToSend: string = 'Unknown';
     if (formData.categoryId) {
-      const selectedOption = categoryOptions.find(
-        opt => opt.value === formData.categoryId
+      const selectedOption = categories.find(
+        opt => opt.value === String(formData.categoryId)
       );
       categoryNameToSend =
         selectedOption?.apiName || selectedOption?.label || 'Unknown';
@@ -148,20 +186,28 @@ const PetForm: React.FC<PetFormProps> = ({
       petObject.tags = tagsArray;
     }
 
-    if (formType === 'update' && formData.id) {
-      petObject.id = Number(formData.id);
-    }
-
     return petObject;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 💡 LOGIC KIỂM TRA ID MỚI ĐƯỢC THÊM VÀO
+    if (formType === 'update' && initialPetData?.id !== Number(formData.id)) {
+      setIdError('Không được thay đổi ID của thú cưng.');
+      setToast({
+        message: 'Lỗi: Không được thay đổi ID của thú cưng.',
+        type: 'error',
+      });
+      return;
+    }
+
+    // Validate form fields
     if (!validate()) {
       setToast({
         message: 'Please fill in all required fields correctly.',
         type: 'error',
-      }); // Updated toast message
+      });
       return;
     }
 
@@ -188,7 +234,7 @@ const PetForm: React.FC<PetFormProps> = ({
             formType === 'add' ? 'added' : 'updated'
           } successfully!`,
           type: 'success',
-        }); // Updated toast message
+        });
 
         if (formType === 'add') {
           handleCancel();
@@ -212,7 +258,7 @@ const PetForm: React.FC<PetFormProps> = ({
               formType === 'add' ? 'adding' : 'updating'
             } pet: ${error.message || 'Please try again.'}`,
             type: 'error',
-          }); // Updated toast message
+          });
         }
       } finally {
         if (
@@ -236,107 +282,95 @@ const PetForm: React.FC<PetFormProps> = ({
       status: 'available',
     });
     setErrors({});
+    setIdError(null); // 💡 Xóa lỗi ID khi hủy form
     setToast(null);
   };
 
-  const categoryOptions: SelectOption[] = [
-    { value: 1, label: 'Dogs', apiName: 'Dogs' }, // Changed label to English
-    { value: 2, label: 'Cats', apiName: 'Cats' }, // Changed label to English
-    { value: 3, label: 'Birds', apiName: 'Birds' }, // Changed label to English
-    { value: 4, label: 'Fish', apiName: 'Fish' }, // Changed label to English
-    { value: 5, label: 'Rabbits', apiName: 'Rabbits' }, // Changed label to English
-    { value: 6, label: 'Hamsters', apiName: 'Hamsters' }, // Changed label to English
-    { value: 7, label: 'Other', apiName: 'Other' }, // Changed label to English
-  ];
-
   const statusOptions: SelectOption[] = [
-    { value: 'available', label: 'Available' }, // Changed label to English
-    { value: 'pending', label: 'Pending' }, // Changed label to English
-    { value: 'sold', label: 'Sold' }, // Changed label to English
+    { value: 'available', label: 'Available' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'sold', label: 'Sold' },
   ];
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-6">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
         <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
-          {formType === 'add' ? 'Add New Pet' : 'Update Pet Information'}{' '}
-          {/* Updated title */}
+          {formType === 'add' ? 'Add New Pet' : 'Update Pet Information'}
         </h1>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {formType === 'update' && (
             <InputGroup
-              label="Pet ID" // Updated label
+              label="Pet ID"
               name="id"
               value={formData.id}
               onChange={handleInputChange}
               type="number"
               readOnly={true}
+              error={idError} // 💡 Truyền lỗi ID vào InputGroup
             />
           )}
-
           <InputGroup
-            label="Pet Name" // Updated label
+            label="Pet Name"
             name="petName"
             value={formData.petName}
             onChange={handleInputChange}
-            placeholder="e.g., Kitty, Puppy" // Updated placeholder
+            placeholder="e.g., Kitty, Puppy"
             error={errors.petName}
           />
-
           <SelectGroup
-            label="Category" // Updated label
+            label="Category"
             name="categoryId"
             value={formData.categoryId}
             onChange={handleInputChange}
-            options={categoryOptions}
+            options={categories}
             error={
               errors.categoryId
                 ? String(errors.categoryId)
                 : errors.categoryName
             }
+            disabled={isLoadingCategories}
           />
+          {isLoadingCategories && (
+            <p className="text-sm text-gray-500">Đang tải danh mục...</p>
+          )}
           {formData.categoryId === 7 || !formData.categoryId ? (
             <InputGroup
-              label="Custom Category Name" // Updated label
+              label="Custom Category Name"
               name="categoryName"
               value={formData.categoryName}
               onChange={handleInputChange}
-              placeholder="Enter new category name (e.g., Ferrets)" // Updated placeholder
+              placeholder="Enter new category name (e.g., Ferrets)"
               error={errors.categoryName}
             />
           ) : null}
-
           <InputGroup
-            label="Photo URLs" // Updated label
+            label="Photo URLs"
             name="photoUrls"
             value={formData.photoUrls}
             onChange={handleInputChange}
             rows={3}
-            placeholder="Paste image URLs here (one URL per line, or comma-separated)" // Updated placeholder
+            placeholder="Paste image URLs here (one URL per line, or comma-separated)"
             error={errors.photoUrls}
           />
-
           <InputGroup
-            label="Tags" // Updated label
+            label="Tags"
             name="tags"
             value={formData.tags}
             onChange={handleInputChange}
-            placeholder="Add relevant tags (e.g., cute, smart, comma-separated)" // Updated placeholder
+            placeholder="Add relevant tags (e.g., cute, smart, comma-separated)"
           />
-
           <RadioGroup
-            label="Status" // Updated label
+            label="Status"
             name="status"
             selectedValue={formData.status}
             onChange={handleStatusChange as (value: string) => void}
             options={statusOptions}
           />
-
           <ActionButtons
             onCancel={handleCancel}
             isSubmitting={isSubmitting}
-            submitText={formType === 'add' ? 'Add Pet' : 'Update Pet'} // Updated button text
+            submitText={formType === 'add' ? 'Add Pet' : 'Update Pet'}
           />
         </form>
       </div>

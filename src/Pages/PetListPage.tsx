@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 /* eslint-disable no-unused-vars */
 // pages/PetListPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
@@ -32,7 +33,12 @@ const PetListPage: React.FC = () => {
         new Map(allPets.map(pet => [pet.id, pet])).values()
       );
 
-      setPets(uniquePets);
+      // 💡 THÊM ĐOẠN CODE NÀY VÀO ĐÂY 💡
+      // Sắp xếp danh sách thú cưng theo ID giảm dần để pet mới nhất luôn ở đầu.
+      // Sử dụng `|| 0` để đảm bảo không bị lỗi nếu pet không có ID.
+      const sortedPets = uniquePets.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+      setPets(sortedPets);
     } catch (err: any) {
       console.error('Failed to fetch pets:', err);
       setError(

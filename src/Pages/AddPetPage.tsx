@@ -1,25 +1,35 @@
-// pages/AddPetPage.tsx
+/* eslint-disable import/no-duplicates */
+// pages/AddPetPage.tsx hiển thị form thêm mới pet
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import PetForm from '../Components/PetForm';
+import Toast from '../Components/Toast'; // Import Toast component
+import { useState } from 'react';
 
 const AddPetPage: React.FC = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   const handleSuccess = () => {
-    // Logic to run after a successful pet addition
-    // console.log('Pet added successfully! Navigating to pet list.');
-    // Display success message (handled by PetForm's internal Toast)
-    // Then, navigate to the pet list page after a short delay for the toast to be seen
+    setToast({ message: 'Pet added successfully!', type: 'success' });
     setTimeout(() => {
-      navigate('/pets'); // Navigate to the pet list page
-    }, 3000); // Delay for 1.5 seconds to allow user to see the toast
+      navigate('/pets');
+    }, 1500); // Wait for the toast to be seen
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      {/* PetForm is designed to be centered by its own max-width and mx-auto */}
       <PetForm formType="add" onSuccess={handleSuccess} />
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 };

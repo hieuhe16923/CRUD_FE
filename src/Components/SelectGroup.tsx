@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // SelectGroup.tsx
 import React from 'react';
-import { SelectOption } from '../types'; // Import SelectOption from types.ts
+import { SelectOption } from '../types';
 
 interface SelectGroupProps {
   label: string;
@@ -10,6 +10,7 @@ interface SelectGroupProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: SelectOption[];
   error?: string;
+  disabled?: boolean; // This prop is correctly defined
 }
 
 const SelectGroup: React.FC<SelectGroupProps> = ({
@@ -19,6 +20,7 @@ const SelectGroup: React.FC<SelectGroupProps> = ({
   onChange,
   options,
   error,
+  disabled, // Make sure to destructure the 'disabled' prop
 }) => {
   return (
     <div>
@@ -33,9 +35,14 @@ const SelectGroup: React.FC<SelectGroupProps> = ({
         name={name}
         value={value}
         onChange={onChange}
+        // Add the `disabled` attribute here to apply it to the select element
+        disabled={disabled}
         className={`w-full px-4 py-2 border ${
           error ? 'border-red-500' : 'border-gray-300'
-        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white appearance-none pr-8 transition duration-150 ease-in-out`}
+        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white appearance-none pr-8 transition duration-150 ease-in-out ${
+          // Optional: Add a style for the disabled state
+          disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+        }`}
       >
         <option value="">Select {label.toLowerCase()}</option>
         {options.map(option => (

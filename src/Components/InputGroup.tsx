@@ -12,7 +12,7 @@ interface InputGroupProps {
   placeholder?: string;
   type?: 'text' | 'number' | 'email' | 'password';
   rows?: number;
-  error?: string;
+  error?: string | null; // 💡 Đã sửa: Cho phép error là string, undefined hoặc null
   readOnly?: boolean;
 }
 
