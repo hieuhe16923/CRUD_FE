@@ -1,0 +1,93 @@
+<div class="pet-list container my-3">
+    <h3 #listRef class="text-center text-warning border-bottom border-2 border-warning py-2">
+        Pet List
+    </h3>
+
+    <div class="row">
+        <div class="col-12 col-md-3 py-2">
+            <h5>Filter by status</h5>
+            <select class="form-select" [(ngModel)]="status" (change)="fetchPetsByStatus(status)">
+                <option value="available">Available</option>
+                <option value="pending">Pending</option>
+                <option value="sold">Sold</option>
+            </select>
+        </div>
+
+        <div class="col-9">
+            <div class="row">
+                @if (!(loading$ | async)) {
+                @if (!(error$ | async)) {
+                @if (currentTableData.length > 0) {
+                @for (pet of currentTableData; track pet.id) {
+                <div class="col-12 col-md-4 mb-4">
+                    <app-pet-card [pet]="pet"></app-pet-card>
+                </div>
+                }
+                } @else {
+                <div class="text-center">
+                    <p>No pets found for selected status.</p>
+                </div>
+                }
+                } @else {
+                <div class="text-center">
+                    <span class="alert alert-danger">Error loading pets</span>
+                </div>
+                }
+                } @else {
+                <div class="d-flex justify-content-center my-4">
+                    <app-loader></app-loader>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination + Jump -->
+    <div class="container row justify-content-center gap-5 mt-4">
+        <div class="col-12 col-lg-6 d-flex flex-column align-items-center">
+            <!-- Updated pagination component usage -->
+            @if (pets.length > pageSize) {
+            <app-pagination [totalCount]="pets.length" [pageSize]="pageSize" [currentPage]="currentPage"
+                (pageChange)="onPageChange($event)">
+            </app-pagination>
+            }
+
+            <!-- Jump to page functionality -->
+            <div class="d-flex flex-column gap-4 align-items-center mt-3">
+                <div class="d-flex gap-2">
+                    <input style="width: 200px;" class="form-control" [(ngModel)]="jumpPageInput"
+                        (ngModelChange)="validateJumpPage()" (focus)="touched = true" placeholder="Enter page number"
+                        type="number" [max]="totalPages" [min]="1" (keydown.enter)="handleJumpPage()" />
+                    <button class="btn btn-primary" (click)="handleJumpPage()"
+                        [disabled]="!!inputPageError || !jumpPageInput.trim()">
+                        Go
+                    </button>
+                </div>
+                @if (inputPageError) {
+                <div #errorRef class="validated-input-error text-danger">
+                    {{ inputPageError }}
+                </div>
+                }
+            </div>
+
+            <!-- Page info display -->
+            @if (pets.length > 0) {
+            <div class="text-muted small mt-2">
+                Showing {{ ((currentPage - 1) * pageSize) + 1 }}
+                to {{ Math.min(currentPage * pageSize, pets.length) }}
+                of {{ pets.length }} pets
+            </div>
+            }
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <h6>Items per page</h6>
+            <select style="width: 100px;" class="form-select" [ngModel]="pageSize"
+                (ngModelChange)="changePageSize(+($event))">
+                <option [value]="12">12</option>
+                <option [value]="24">24</option>
+                <option [value]="48">48</option>
+            </select>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+.pet-card-tag-list {
+    display        : flex;
+    align-items    : center;
+    flex-wrap      : nowrap;
+    /* keep all tags in one line */
+    overflow-x     : auto;
+    /* enable horizontal scroll */
+    gap            : 0.25rem;
+    /* spacing between tags */
+    scrollbar-width: none;
+    /* Firefox     : hide scrollbar */
+}
+
+.pet-card-tag-list::-webkit-scrollbar {
+    display                : none;
+    /* Chrome, Safari, Edge: hide scrollbar */
+}

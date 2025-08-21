@@ -1,0 +1,27 @@
+@if (shouldShowPagination) {
+<ul [class]="'pagination-container' + (className ? ' ' + className : '')">
+
+    <!-- Left navigation arrow -->
+    <li class="pagination-item" [class.disabled]="isPreviousDisabled" (click)="onPrevious()">
+        <i class="fa-solid fa-chevron-left"></i>
+    </li>
+
+    <!-- Page numbers and dots -->
+    @for (pageNumber of paginationRange; track trackByFn($index, pageNumber)) {
+    <li [class]="'pagination-item' + (isDots(pageNumber) ? ' dots' : '') + (isSelected(pageNumber) ? ' selected' : '')"
+        (click)="onPageClick(pageNumber)">
+        @if (isDots(pageNumber)) {
+        <span>&#8230;</span>
+        } @else {
+        <span>{{ pageNumber }}</span>
+        }
+    </li>
+    }
+
+    <!-- Right navigation arrow -->
+    <li class="pagination-item" [class.disabled]="isNextDisabled" (click)="onNext()">
+        <i class="fa-solid fa-chevron-right"></i>
+    </li>
+
+</ul>
+}
